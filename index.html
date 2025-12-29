@@ -15,6 +15,8 @@
             --accent: #fb7185;
             --text: #f8fafc;
             --wave-color: rgba(56, 189, 248, 0.2);
+            --robin-brown: #5d4037;
+            --robin-red: #e64a19;
         }
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; touch-action: manipulation; }
@@ -38,84 +40,99 @@
         h1 { margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
         p { margin: 0; opacity: 0.6; font-size: 0.85rem; }
 
-        .btn-main { 
-            width: 100px; height: 100px; border-radius: 50%; border: none;
-            background: var(--primary); color: white; cursor: pointer;
+        /* --- LE ROUGE-GORGE (BOUTON PLAY) --- */
+        .robin-btn {
+            width: 120px; height: 120px; border-radius: 50%; border: none;
+            background: none; cursor: pointer;
+            margin: 1rem auto; position: relative;
+            transition: transform 0.3s ease;
             display: flex; align-items: center; justify-content: center;
-            margin: 1rem auto; transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
         }
-        .btn-main.playing { background: var(--accent); transform: scale(1.05); }
-        .btn-main svg { width: 40px; height: 40px; fill: currentColor; }
 
-        .control-group { text-align: left; }
-        .label-header { display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
-
-        select {
-            width: 100%; padding: 12px; border-radius: 12px;
-            background: #2d3748; border: 1px solid rgba(255,255,255,0.2);
-            color: white; font-size: 1rem; outline: none; appearance: none;
+        .robin-body {
+            position: relative; width: 80px; height: 75px;
+            background: var(--robin-brown); border-radius: 50% 50% 45% 45%;
+            transition: all 0.5s ease;
         }
-        
-        input[type=range] { width: 100%; height: 6px; border-radius: 10px; appearance: none; background: rgba(255,255,255,0.1); outline: none; }
-        input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
 
-        /* --- ANIMATION VAGUES (RIVIÈRE) --- */
-        .waves-bg {
+        .robin-chest {
+            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 40px; background: var(--robin-red);
+            border-radius: 50% 50% 40% 40%;
+        }
+
+        .robin-eye {
+            position: absolute; top: 25px; width: 8px; height: 8px;
+            background: #222; border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .robin-eye.left { left: 20px; }
+        .robin-eye.right { right: 20px; }
+
+        .robin-beak {
+            position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #f9a825;
+        }
+
+        /* Animation quand Bobby dort */
+        .robin-btn.playing .robin-body { animation: breathe 4s ease-in-out infinite; }
+        .robin-btn.playing .robin-eye { height: 2px; border-radius: 0; top: 28px; background: #444; }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* --- ANIMATIONS ARRIÈRE-PLAN --- */
+        .waves-bg, .zzz-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; opacity: 0; transition: opacity 1s; overflow: hidden; z-index: 5;
+            pointer-events: none; opacity: 0; transition: opacity 1s; overflow: hidden;
         }
-        .waves-bg.active { opacity: 1; }
-        .wave-source { position: absolute; width: 1px; height: 1px; }
-        .s1 { top: 20%; left: 20%; } .s2 { top: 80%; left: 15%; }
-        .s3 { top: 50%; left: 85%; } .s4 { top: 15%; left: 75%; }
+        .waves-bg.active, .zzz-container.active { opacity: 1; }
+
         .circle {
             position: absolute; border: 1px solid var(--wave-color);
             border-radius: 50%; opacity: 0; transform: translate(-50%, -50%);
             animation: ripple 4s linear infinite;
         }
-        .s1 .circle { animation-delay: 0s; } .s2 .circle { animation-delay: 1s; }
-        .s3 .circle { animation-delay: 2s; } .s4 .circle { animation-delay: 3s; }
         @keyframes ripple {
-            0% { width: 0; height: 0; opacity: 0; }
-            20% { opacity: 1; }
-            100% { width: 400px; height: 400px; opacity: 0; }
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 500px; height: 500px; opacity: 0; }
         }
 
-        /* --- ANIMATION Zzz (BRUIT ROSE) --- */
-        .zzz-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; opacity: 0; transition: opacity 1s; z-index: 25;
-        }
-        .zzz-container.active { opacity: 1; }
         .z {
             position: absolute; color: var(--accent); font-weight: bold;
-            opacity: 0; bottom: 50%; left: 50%;
-            text-shadow: 0 0 10px rgba(251, 113, 133, 0.4);
-            animation: sleepZ 4s infinite linear;
+            opacity: 0; bottom: 50%; left: 50%; animation: sleepZ 4s infinite linear;
         }
-        .z:nth-child(1) { animation-delay: 0s; font-size: 1.5rem; }
-        .z:nth-child(2) { animation-delay: 1.3s; font-size: 2.2rem; }
-        .z:nth-child(3) { animation-delay: 2.6s; font-size: 3rem; }
-
         @keyframes sleepZ {
             0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
             20% { opacity: 0.7; }
             100% { opacity: 0; transform: translate(60px, -180px) scale(1.2) rotate(20deg); }
         }
+
+        /* Menus et sliders */
+        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; outline: none; appearance: none; }
+        input[type=range] { width: 100%; height: 6px; border-radius: 10px; appearance: none; background: rgba(255,255,255,0.1); outline: none; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
+        .control-group { text-align: left; }
+        .label-header { display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
     </style>
 </head>
 <body>
 
     <div id="waveLayer" class="waves-bg">
-        <div class="wave-source s1"><div class="circle"></div></div>
-        <div class="wave-source s2"><div class="circle"></div></div>
-        <div class="wave-source s3"><div class="circle"></div></div>
-        <div class="wave-source s4"><div class="circle"></div></div>
+        <div style="position:absolute; top:20%; left:20%"><div class="circle" style="animation-delay:0s"></div></div>
+        <div style="position:absolute; top:80%; left:15%"><div class="circle" style="animation-delay:1s"></div></div>
+        <div style="position:absolute; top:50%; left:85%"><div class="circle" style="animation-delay:2s"></div></div>
     </div>
 
     <div id="zzzLayer" class="zzz-container">
-        <div class="z">Z</div><div class="z">Z</div><div class="z">Z</div>
+        <div class="z" style="animation-delay:0s; font-size:1.5rem">Z</div>
+        <div class="z" style="animation-delay:1.5s; font-size:2.2rem">Z</div>
+        <div class="z" style="animation-delay:3s; font-size:3rem">Z</div>
     </div>
 
     <div class="container">
@@ -125,7 +142,14 @@
                 <p>Bobby murmure pour t'aider à dormir</p>
             </div>
             
-            <button id="playBtn" class="btn-main"><svg id="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+            <button id="playBtn" class="robin-btn" aria-label="Play">
+                <div class="robin-body">
+                    <div class="robin-eye left"></div>
+                    <div class="robin-eye right"></div>
+                    <div class="robin-beak"></div>
+                    <div class="robin-chest"></div>
+                </div>
+            </button>
 
             <div class="control-group">
                 <div class="label-header">Ambiance</div>
@@ -138,7 +162,7 @@
             <div class="control-group">
                 <div class="label-header">Minuteur</div>
                 <select id="timerSelect">
-                    <option value="0" data-label="Infini (Sans minuteur)">Infini (Sans minuteur)</option>
+                    <option value="0" data-label="Infini">Infini</option>
                     <option value="15" data-label="15 Minutes">15 Minutes</option>
                     <option value="30" data-label="30 Minutes">30 Minutes</option>
                     <option value="60" data-label="1 Heure">1 Heure</option>
@@ -159,7 +183,6 @@
         let timeLeft = 0;
 
         const btn = document.getElementById('playBtn');
-        const iconPath = document.querySelector('#icon path');
         const volSlider = document.getElementById('volume');
         const modeSelect = document.getElementById('modeSelect');
         const timerSelect = document.getElementById('timerSelect');
@@ -206,39 +229,6 @@
             }
         }
 
-        function startTimer(minutes) {
-            resetTimerLabels();
-            if (minutes === 0) return;
-            timeLeft = minutes * 60;
-            updateTimerInMenu();
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerInMenu();
-                if (timeLeft <= 0) { clearInterval(timerInterval); stopWithFade(); }
-            }, 1000);
-        }
-
-        function updateTimerInMenu() {
-            const activeOption = timerSelect.options[timerSelect.selectedIndex];
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            activeOption.textContent = `⏳ ${mins}:${secs.toString().padStart(2, '0')}...`;
-        }
-
-        function resetTimerLabels() {
-            clearInterval(timerInterval);
-            Array.from(timerSelect.options).forEach(opt => {
-                opt.textContent = opt.getAttribute('data-label');
-            });
-        }
-
-        function stopWithFade() {
-            if (gainNode) {
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 5);
-                setTimeout(() => { if (isPlaying) togglePlay(); }, 5000);
-            }
-        }
-
         async function togglePlay() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (!isPlaying) {
@@ -250,34 +240,46 @@
                 gainNode.gain.setValueAtTime(volSlider.value, audioCtx.currentTime);
                 sourceNode.connect(gainNode).connect(audioCtx.destination);
                 sourceNode.start();
-                iconPath.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z");
                 btn.classList.add('playing');
                 isPlaying = true;
-                startTimer(parseInt(timerSelect.value));
+                if (parseInt(timerSelect.value) > 0) startTimer(parseInt(timerSelect.value));
             } else {
                 if(sourceNode) try { sourceNode.stop(); } catch(e) {}
                 resetTimerLabels();
-                iconPath.setAttribute('d', "M8 5v14l11-7z");
                 btn.classList.remove('playing');
                 isPlaying = false;
             }
             updateAnims();
         }
 
+        function startTimer(minutes) {
+            resetTimerLabels();
+            timeLeft = minutes * 60;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const activeOption = timerSelect.options[timerSelect.selectedIndex];
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                activeOption.textContent = `⏳ ${mins}:${secs.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) { 
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 5);
+                    setTimeout(() => togglePlay(), 5000);
+                }
+            }, 1000);
+        }
+
+        function resetTimerLabels() {
+            clearInterval(timerInterval);
+            Array.from(timerSelect.options).forEach(opt => opt.textContent = opt.getAttribute('data-label'));
+        }
+
         btn.addEventListener('click', togglePlay);
         modeSelect.addEventListener('change', () => { if (isPlaying) { togglePlay(); togglePlay(); } });
-        timerSelect.addEventListener('change', () => { if (isPlaying) startTimer(parseInt(timerSelect.value)); });
         volSlider.addEventListener('input', (e) => {
             const val = e.target.value;
             document.getElementById('volPerc').textContent = Math.round(val * 100) + "%";
             if (gainNode) gainNode.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
         });
-
-        if ('serviceWorker' in navigator) {
-            const swCode = "self.addEventListener('fetch', (e) => {});";
-            const blob = new Blob([swCode], {type: 'text/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob));
-        }
     </script>
 </body>
 </html>
