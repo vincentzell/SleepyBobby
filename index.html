@@ -12,116 +12,114 @@
             --accent: #fb7185;
             --text: #f8fafc;
             --wave-color: rgba(56, 189, 248, 0.2);
-            --robin-brown: #5d4037;
-            --robin-red: #e64a19;
+            --robin-body: #6d4c41;
+            --robin-belly: #d7ccc8;
+            --robin-red: #f4511e;
         }
 
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; touch-action: manipulation; }
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            display: flex; align-items: center; justify-content: center;
-            background: var(--bg); color: var(--text);
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+        body { display: flex; align-items: center; justify-content: center; }
 
-        .container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; text-align: center; position: relative; z-index: 10; }
+        .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
 
         .card {
-            background: var(--card); padding: clamp(1.5rem, 5vh, 2.5rem);
-            border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; gap: 1.2rem;
-            border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            position: relative; z-index: 20;
+            background: var(--card); padding: 2rem; border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px); position: relative; z-index: 20;
         }
 
-        h1 { margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
-        p { margin: 0; opacity: 0.6; font-size: 0.85rem; }
+        h1 { margin: 0; font-size: 1.6rem; }
+        p { margin: 5px 0 20px; opacity: 0.6; font-size: 0.8rem; }
 
-        /* --- ROUGE-GORGE (BOUTON) --- */
-        .robin-btn {
-            width: 120px; height: 120px; border: none; background: none; cursor: pointer;
-            margin: 1rem auto; display: flex; align-items: center; justify-content: center;
+        /* --- ROUGE-GORGE CSS --- */
+        .play-btn {
+            width: 140px; height: 140px; border: none; background: none; cursor: pointer;
+            margin: 10px auto; display: flex; align-items: center; justify-content: center;
+            position: relative; transition: transform 0.3s ease;
         }
-        .robin-body {
-            position: relative; width: 80px; height: 75px;
-            background: var(--robin-brown); border-radius: 50% 50% 45% 45%;
-            transition: all 0.5s ease;
+
+        .robin {
+            position: relative; width: 100px; height: 90px;
+            background: var(--robin-body); border-radius: 55% 45% 45% 35%;
+            box-shadow: inset -10px -5px 15px rgba(0,0,0,0.2);
         }
-        .robin-chest {
-            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
-            width: 50px; height: 40px; background: var(--robin-red); border-radius: 50% 50% 40% 40%;
+
+        .robin-red-patch {
+            position: absolute; bottom: 8px; left: 15px; width: 65px; height: 50px;
+            background: var(--robin-red); border-radius: 50% 50% 40% 40%;
         }
+
         .robin-eye {
-            position: absolute; top: 25px; width: 8px; height: 8px; background: #222; border-radius: 50%;
-        }
-        .robin-eye.left { left: 20px; }
-        .robin-eye.right { right: 20px; }
-        
-        /* PETIT BEC */
-        .robin-beak {
-            position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 5px solid #f9a825; /* Bec plus court et fin */
+            position: absolute; top: 28px; right: 25px; width: 8px; height: 8px;
+            background: #222; border-radius: 50%; transition: all 0.4s ease;
         }
 
-        .robin-btn.playing .robin-body { animation: breathe 4s ease-in-out infinite; }
-        .robin-btn.playing .robin-eye { height: 2px; border-radius: 0; top: 28px; }
+        .robin-beak {
+            position: absolute; top: 35px; right: 5px; width: 12px; height: 8px;
+            background: #ffa000; clip-path: polygon(0 0, 0 100%, 100% 50%);
+        }
+
+        .robin-wing {
+            position: absolute; top: 30px; left: 10px; width: 45px; height: 25px;
+            background: #5d4037; border-radius: 50%; transform: rotate(-10deg);
+        }
+
+        /* Animation Sommeil */
+        .play-btn.playing .robin { animation: breathe 4s ease-in-out infinite; }
+        .play-btn.playing .robin-eye { height: 2px; border-radius: 2px; top: 32px; background: #3e2723; }
 
         @keyframes breathe {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
 
-        /* --- VAGUES --- */
-        .waves-bg {
+        /* --- EFFETS VISUELS --- */
+        .waves-bg, .zzz-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; opacity: 0; transition: opacity 1s; z-index: 5;
+            pointer-events: none; opacity: 0; transition: opacity 1s;
         }
-        .waves-bg.active { opacity: 1; }
+        .waves-bg.active, .zzz-layer.active { opacity: 1; }
+
         .circle {
             position: absolute; border: 1px solid var(--wave-color); border-radius: 50%;
-            opacity: 0; transform: translate(-50%, -50%); animation: ripple 4s linear infinite;
+            transform: translate(-50%, -50%); animation: ripple 4s linear infinite;
         }
         @keyframes ripple {
             0% { width: 0; height: 0; opacity: 1; }
-            100% { width: 500px; height: 500px; opacity: 0; }
+            100% { width: 600px; height: 600px; opacity: 0; }
         }
 
-        /* --- ZZZ --- */
-        .zzz-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; opacity: 0; transition: opacity 1s; z-index: 100; /* Devant tout */
-        }
-        .zzz-container.active { opacity: 1; }
         .z {
             position: absolute; color: var(--accent); font-weight: bold;
-            opacity: 0; bottom: 50%; left: 50%; animation: sleepZ 4s infinite linear;
+            opacity: 0; bottom: 50%; left: 55%; animation: sleepZ 4s infinite linear;
+            z-index: 100;
         }
         @keyframes sleepZ {
-            0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+            0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
             20% { opacity: 0.8; }
-            100% { opacity: 0; transform: translate(50px, -200px) scale(1.2) rotate(20deg); }
+            100% { opacity: 0; transform: translate(60px, -200px) scale(1.5) rotate(20deg); }
         }
 
-        /* INTERFACE */
-        .control-group { text-align: left; margin-top: 10px; }
-        .label-header { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
-        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.2); color: white; outline: none; appearance: none; }
-        input[type=range] { width: 100%; height: 6px; appearance: none; background: rgba(255,255,255,0.1); border-radius: 10px; }
-        input[type=range]::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
+        /* CONTROLES */
+        .control-group { text-align: left; margin-top: 15px; }
+        .label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; display: block; }
+        select {
+            width: 100%; padding: 12px; border-radius: 12px; background: #2d3748;
+            border: 1px solid rgba(255,255,255,0.1); color: white; outline: none; appearance: none;
+        }
+        input[type=range] { width: 100%; height: 6px; appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--card); }
     </style>
 </head>
 <body>
 
     <div id="waveLayer" class="waves-bg">
-        <div style="position:absolute; top:25%; left:25%"><div class="circle" style="animation-delay:0s"></div></div>
-        <div style="position:absolute; top:75%; left:20%"><div class="circle" style="animation-delay:1.5s"></div></div>
-        <div style="position:absolute; top:50%; left:80%"><div class="circle" style="animation-delay:3s"></div></div>
+        <div style="position:absolute; top:30%; left:50%"><div class="circle" style="animation-delay:0s"></div></div>
+        <div style="position:absolute; top:70%; left:30%"><div class="circle" style="animation-delay:1.3s"></div></div>
+        <div style="position:absolute; top:50%; left:80%"><div class="circle" style="animation-delay:2.6s"></div></div>
     </div>
 
-    <div id="zzzLayer" class="zzz-container">
+    <div id="zzzLayer" class="zzz-layer">
         <div class="z" style="animation-delay:0s; font-size:1.5rem">Z</div>
         <div class="z" style="animation-delay:1.3s; font-size:2.2rem">Z</div>
         <div class="z" style="animation-delay:2.6s; font-size:3rem">Z</div>
@@ -132,17 +130,17 @@
             <h1>Sleepy Bobby</h1>
             <p>Bobby murmure pour t'aider à dormir</p>
             
-            <button id="playBtn" class="robin-btn">
-                <div class="robin-body">
-                    <div class="robin-eye left"></div>
-                    <div class="robin-eye right"></div>
+            <button id="playBtn" class="play-btn">
+                <div class="robin">
+                    <div class="robin-red-patch"></div>
+                    <div class="robin-wing"></div>
+                    <div class="robin-eye"></div>
                     <div class="robin-beak"></div>
-                    <div class="robin-chest"></div>
                 </div>
             </button>
 
             <div class="control-group">
-                <div class="label-header">Ambiance</div>
+                <span class="label">Ambiance</span>
                 <select id="modeSelect">
                     <option value="river" selected>Rivière Douce</option>
                     <option value="pink">Bruit Rose (Sédatif)</option>
@@ -150,7 +148,7 @@
             </div>
 
             <div class="control-group">
-                <div class="label-header">Volume <span id="volPerc">100%</span></div>
+                <span class="label">Volume <span id="volPerc">100%</span></span>
                 <input type="range" id="volume" min="0" max="1" step="0.01" value="1.0">
             </div>
         </div>
@@ -161,17 +159,16 @@
         let isPlaying = false;
 
         const btn = document.getElementById('playBtn');
-        const volSlider = document.getElementById('volume');
         const modeSelect = document.getElementById('modeSelect');
+        const volSlider = document.getElementById('volume');
         const waveLayer = document.getElementById('waveLayer');
         const zzzLayer = document.getElementById('zzzLayer');
 
         function createRiverBuffer(context) {
-            const bufferSize = context.sampleRate * 6;
-            const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
+            const buffer = context.createBuffer(1, context.sampleRate * 6, context.sampleRate);
             const data = buffer.getChannelData(0);
             let lp0 = 0, lp1 = 0;
-            for (let i = 0; i < bufferSize; i++) {
+            for (let i = 0; i < data.length; i++) {
                 const white = Math.random() * 2 - 1;
                 lp0 = 0.95 * lp0 + 0.05 * white;
                 lp1 = 0.95 * lp1 + 0.05 * lp0;
@@ -181,11 +178,10 @@
         }
 
         function createPinkNoiseBuffer(context) {
-            const bufferSize = context.sampleRate * 2;
-            const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
+            const buffer = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
             const data = buffer.getChannelData(0);
             let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
-            for (let i = 0; i < bufferSize; i++) {
+            for (let i = 0; i < data.length; i++) {
                 let white = Math.random() * 2 - 1;
                 b0 = 0.99886*b0 + white*0.0555179; b1 = 0.99332*b1 + white*0.0750759;
                 b2 = 0.96900*b2 + white*0.1538520; b3 = 0.86650*b3 + white*0.3104856;
@@ -204,6 +200,7 @@
         async function togglePlay() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (!isPlaying) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 sourceNode = audioCtx.createBufferSource();
                 sourceNode.buffer = (modeSelect.value === 'river') ? createRiverBuffer(audioCtx) : createPinkNoiseBuffer(audioCtx);
                 sourceNode.loop = true;
