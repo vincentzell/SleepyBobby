@@ -14,7 +14,7 @@
             --primary: #38bdf8;
             --accent: #fb7185;
             --text: #f8fafc;
-            --wave-color: rgba(56, 189, 248, 0.4);
+            --wave-color: rgba(56, 189, 248, 0.2);
         }
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; touch-action: manipulation; }
@@ -24,13 +24,14 @@
             background: var(--bg); color: var(--text);
         }
 
-        .container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; text-align: center; position: relative; z-index: 1; }
+        .container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; text-align: center; position: relative; z-index: 10; }
 
         .card {
             background: var(--card); padding: clamp(1.5rem, 5vh, 2.5rem);
-            border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             display: flex; flex-direction: column; gap: 1.2rem;
             border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
         }
 
         h1 { margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
@@ -51,37 +52,56 @@
 
         select {
             width: 100%; padding: 12px; border-radius: 12px;
-            background: #2d3748;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white; font-size: 1rem; outline: none;
-            appearance: none;
+            background: #2d3748; border: 1px solid rgba(255,255,255,0.2);
+            color: white; font-size: 1rem; outline: none; appearance: none;
         }
-        
         select option { background-color: #1e293b; color: white; }
 
         input[type=range] { width: 100%; height: 6px; border-radius: 10px; appearance: none; background: rgba(255,255,255,0.1); outline: none; }
         input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
 
-        .wave-animation-container {
+        /* --- Système de Multi-Vagues --- */
+        .waves-background {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+            pointer-events: none; opacity: 0; transition: opacity 1s ease;
+            overflow: hidden;
         }
-        .wave-animation-container.active { opacity: 1; }
-        .wave { position: absolute; border: 2px solid var(--wave-color); border-radius: 50%; opacity: 0; animation: wave-grow 2.5s linear infinite; }
-        .wave:nth-child(2) { animation-delay: 0.8s; }
-        .wave:nth-child(3) { animation-delay: 1.6s; }
+        .waves-background.active { opacity: 1; }
 
-        @keyframes wave-grow {
-            0% { width: 0; height: 0; opacity: 1; transform: translate(-50%, -50%); }
-            100% { width: 500px; height: 500px; opacity: 0; transform: translate(-50%, -50%); }
+        .wave-source { position: absolute; width: 1px; height: 1px; }
+        
+        /* Positions des sources */
+        .s1 { top: 20%; left: 20%; }
+        .s2 { top: 80%; left: 15%; }
+        .s3 { top: 50%; left: 80%; }
+        .s4 { top: 15%; left: 70%; }
+
+        .circle {
+            position: absolute; border: 1px solid var(--wave-color);
+            border-radius: 50%; opacity: 0;
+            transform: translate(-50%, -50%);
+            animation: ripple 4s linear infinite;
+        }
+
+        .s1 .circle { animation-delay: 0s; }
+        .s2 .circle { animation-delay: 1s; }
+        .s3 .circle { animation-delay: 2s; }
+        .s4 .circle { animation-delay: 3s; }
+
+        @keyframes ripple {
+            0% { width: 0; height: 0; opacity: 0; }
+            20% { opacity: 1; }
+            100% { width: 500px; height: 500px; opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div id="waveContainer" class="wave-animation-container">
-        <div class="wave"></div><div class="wave"></div><div class="wave"></div>
+    <div id="waveContainer" class="waves-background">
+        <div class="wave-source s1"><div class="circle"></div></div>
+        <div class="wave-source s2"><div class="circle"></div></div>
+        <div class="wave-source s3"><div class="circle"></div></div>
+        <div class="wave-source s4"><div class="circle"></div></div>
     </div>
 
     <div class="container">
@@ -91,9 +111,7 @@
                 <p>Bobby murmure pour t'aider à dormir</p>
             </div>
             
-            <button id="playBtn" class="btn-main" aria-label="Jouer">
-                <svg id="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </button>
+            <button id="playBtn" class="btn-main"><svg id="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
 
             <div class="control-group">
                 <div class="label-header">Ambiance</div>
@@ -133,7 +151,6 @@
         const timerSelect = document.getElementById('timerSelect');
         const waveContainer = document.getElementById('waveContainer');
 
-        // Égalisation : Bruit Rose (Densité réduite pour matcher la rivière)
         function createPinkNoiseBuffer(context) {
             const bufferSize = context.sampleRate * 2;
             const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
@@ -150,7 +167,6 @@
             return buffer;
         }
 
-        // Égalisation : Rivière (Gain boosté et filtre ajusté)
         function createRiverBuffer(context) {
             const bufferSize = context.sampleRate * 6;
             const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
@@ -174,10 +190,7 @@
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerInMenu();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    stopWithFade();
-                }
+                if (timeLeft <= 0) { clearInterval(timerInterval); stopWithFade(); }
             }, 1000);
         }
 
@@ -197,9 +210,8 @@
 
         function stopWithFade() {
             if (gainNode) {
-                const fadeTime = 5;
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + fadeTime);
-                setTimeout(() => { if (isPlaying) togglePlay(); }, fadeTime * 1000);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 5);
+                setTimeout(() => { if (isPlaying) togglePlay(); }, 5000);
             }
         }
 
@@ -231,9 +243,7 @@
         }
 
         btn.addEventListener('click', togglePlay);
-        timerSelect.addEventListener('change', () => {
-            if (isPlaying) startTimer(parseInt(timerSelect.value));
-        });
+        timerSelect.addEventListener('change', () => { if (isPlaying) startTimer(parseInt(timerSelect.value)); });
         modeSelect.addEventListener('change', () => { if (isPlaying) { togglePlay(); togglePlay(); } });
         volSlider.addEventListener('input', (e) => {
             const val = e.target.value;
