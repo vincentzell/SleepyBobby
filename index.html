@@ -28,34 +28,32 @@
             backdrop-filter: blur(10px); position: relative; z-index: 20; color: var(--text);
         }
 
-        /* --- BOBBY --- */
+        /* --- BOBBY & SA BRANCHE --- */
         .play-btn-wrapper { 
             position: relative; 
             margin: 10px auto 30px; 
-            width: 120px; height: 150px; 
-            display: flex; flex-direction: column; align-items: center; 
+            width: 160px; height: 150px; 
+            display: flex; justify-content: center; align-items: center;
         }
 
         .play-btn { 
-            width: 100px; height: 130px; border: none; background: none; cursor: pointer; 
-            position: relative; z-index: 60; /* Pour capter le clic */
-            display: flex; flex-direction: column; align-items: center; 
+            width: 140px; height: 140px; border: none; background: none; cursor: pointer; 
+            position: relative; z-index: 60; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* 1. BRANCHE (AU PREMIER PLAN) */
+        /* BRANCHE AU PREMIER PLAN (Z-INDEX 100) */
         .branch { 
-            position: absolute; width: 140px; height: 10px; 
-            background: var(--branch-brown); bottom: 30px; 
+            position: absolute; 
+            width: 140px; height: 12px; 
+            background: var(--branch-brown); 
+            bottom: 35px; /* Positionnée juste sous le corps */
             left: 50%; transform: translateX(-50%); 
-            border-radius: 10px; z-index: 50; /* Devant le corps et les pattes */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border-radius: 10px; 
+            z-index: 100; /* Devant tout le reste */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* 2. PATTES (Derrière la branche) */
-        .legs { display: flex; justify-content: center; gap: 15px; position: relative; z-index: 40; margin-top: -8px; }
-        .leg { width: 8px; height: 12px; background: var(--bird-dark-grey); border-radius: 3px; }
-
-        /* 3. CORPS (Derrière les pattes) */
         .bird-body { 
             width: 90px; height: 100px; background: var(--bird-grey); 
             border-radius: 50% 50% 45% 45%; position: relative; 
@@ -65,27 +63,30 @@
         .head-top { position: absolute; top: 0; left: 20%; width: 60%; height: 25px; background: var(--bird-dark-grey); border-radius: 0 0 15px 15px; }
         .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; }
         .eyes { position: absolute; top: 35px; width: 45px; display: flex; justify-content: space-between; left: 50%; transform: translateX(-50%); }
-        .eye { width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%; transition: all 0.4s ease; }
+        .eye { width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%; }
         .beak { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #f1c40f; }
 
-        /* 4. QUEUE (Le plus au fond) */
+        .legs { display: flex; justify-content: center; gap: 15px; position: absolute; bottom: 38px; z-index: 40; }
+        .leg { width: 8px; height: 12px; background: var(--bird-dark-grey); border-radius: 3px; }
+
         .tail { 
             width: 25px; height: 40px; background: var(--bird-grey); 
             border-radius: 0 0 10px 10px; 
-            position: absolute; bottom: 5px; 
+            position: absolute; bottom: 15px; 
             left: 50%; transform: translateX(-50%); 
-            z-index: 10; 
+            z-index: 10; /* Derrière la branche et le corps */
         }
 
         /* Animations */
         .play-btn.playing .bird-body { animation: breathe 4s ease-in-out infinite; }
         .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 3px; }
         .playing-state .branch { animation: sway 4s ease-in-out infinite; }
+        
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes sway { 0%, 100% { transform: translateX(-50%) rotate(0deg); } 50% { transform: translateX(-50%) rotate(1deg); } }
+        @keyframes sway { 0%, 100% { transform: translateX(-50%) rotate(0deg); } 50% { transform: translateX(-50%) rotate(1.5deg); } }
 
-        /* EFFETS */
-        .anim-container { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        /* EFFETS PREMIER PLAN */
+        .anim-container { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; pointer-events: none; z-index: 150; }
         .wave-emitter, .zzz-emitter { position: absolute; top: 50%; left: 50%; opacity: 0; transition: opacity 0.5s; }
         .wave-emitter.active, .zzz-emitter.active { opacity: 1; }
         .circle { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: ripple 4s linear infinite; }
@@ -125,26 +126,21 @@
                     <div class="bird-body">
                         <div class="head-top"></div>
                         <div class="chest"></div>
-                        <div class="eyes">
-                            <div class="eye"></div>
-                            <div class="eye"></div>
-                        </div>
+                        <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                         <div class="beak"></div>
                     </div>
-                    <div class="legs">
-                        <div class="leg"></div>
-                        <div class="leg"></div>
-                    </div>
+                    <div class="legs"><div class="leg"></div><div class="leg"></div></div>
                     <div class="tail"></div>
+                    
+                    <div class="branch"></div>
                 </button>
-                <div class="branch"></div>
             </div>
 
             <div class="control-group">
                 <span class="label">Ambiance</span>
                 <select id="modeSelect">
                     <option value="river" selected>Rivière Douce</option>
-                    <option value="pink">Bruit Rose (Sommeil)</option>
+                    <option value="pink">Bruit Rose</option>
                 </select>
             </div>
             <div class="control-group">
