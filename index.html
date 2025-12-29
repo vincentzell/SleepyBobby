@@ -2,249 +2,182 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sleepy Bobby</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobby l'Oiseau</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #38bdf8;
-            --accent: #fb7185;
-            --text: #f8fafc;
-            --wave-color: rgba(56, 189, 248, 0.2);
-            /* Couleurs Bobby Authentiques */
-            --bobby-brown: #5d4037; /* Marron plumage */
-            --bobby-red: #e64a19;   /* Rouge orangé authentique */
-            --bobby-beak: #ffa726;
+            --bg-blue: #74b9cf;
+            --card-white: #ffffff;
+            --bird-grey: #b8b0a5;
+            --bird-dark-grey: #8d7e71;
+            --bird-orange: #e65a28;
+            --branch-brown: #8b5d43;
+            --branch-dark: #6d4633;
         }
 
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
-        body { display: flex; align-items: center; justify-content: center; }
-
-        .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
-
-        .card {
-            background: var(--card); padding: 2rem; border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px); position: relative; z-index: 20;
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-blue);
         }
 
-        h1 { margin: 0; font-size: 1.6rem; }
-        p { margin: 5px 0 20px; opacity: 0.6; font-size: 0.8rem; }
-
-        /* --- BOBBY (BOUTON CENTRAL) --- */
-        .play-btn-wrapper { position: relative; margin: 10px auto; width: 120px; height: 120px; }
-        
-        .play-btn {
-            width: 100%; height: 100%; border: none; background: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; position: relative; z-index: 30;
+        .canvas {
+            width: 400px;
+            height: 550px;
+            background-color: var(--card-white);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
-        .bobby-icon {
-            position: relative; width: 80px; height: 80px;
-            background: var(--bobby-brown); border-radius: 22px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; transition: transform 0.3s ease;
-        }
-
-        .bobby-face { position: relative; width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-        
-        .eye-container { display: flex; gap: 14px; margin-top: 8px; }
-        .eye { width: 8px; height: 8px; background: #1a1a1a; border-radius: 50%; transition: all 0.4s ease; }
-        
-        .beak { width: 0; height: 0; margin-top: 5px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--bobby-beak); }
-
-        /* Plastron rouge remonté */
-        .red-patch { 
-            position: absolute; 
-            top: 25px; /* Remonté pour entourer le bec */
-            width: 100%; height: 60px; 
-            background: var(--bobby-red); 
-            border-radius: 50% 50% 0 0;
+        /* La Branche de Bobby */
+        .branch {
+            position: absolute;
+            width: 100%;
+            height: 16px;
+            background-color: var(--branch-brown);
+            bottom: 35%;
             z-index: 1;
         }
 
-        .play-btn.playing .bobby-icon { animation: breathe 4s ease-in-out infinite; }
-        .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 11px; }
+        /* Taches sur la branche */
+        .branch::before {
+            content: '';
+            position: absolute;
+            left: 10%; top: 5px;
+            width: 40px; height: 6px;
+            background: var(--branch-dark);
+            border-radius: 10px;
+            box-shadow: 180px 0 var(--branch-dark), 250px 0 var(--branch-dark);
+        }
 
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        /* Structure de Bobby */
+        .bird {
+            position: relative;
+            z-index: 2;
+            top: 25px; /* Ajustement pour être sur la branche */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        /* --- ANIMATIONS ÉMANANT DE BOBBY --- */
-        .anim-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; pointer-events: none; z-index: 25; }
+        /* Le corps bien rond */
+        .body {
+            width: 105px;
+            height: 105px;
+            background-color: var(--bird-grey);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
 
-        .wave-emitter, .zzz-emitter { position: absolute; top: 50%; left: 50%; opacity: 0; transition: opacity 0.5s; }
-        .wave-emitter.active, .zzz-emitter.active { opacity: 1; }
+        /* Le front de Bobby */
+        .head-top {
+            position: absolute;
+            top: 0;
+            width: 55px;
+            height: 25px;
+            background-color: var(--bird-dark-grey);
+            border-radius: 0 0 25px 25px;
+        }
 
-        .circle { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleUnify 4s linear infinite; }
-        @keyframes rippleUnify { 0% { width: 80px; height: 80px; opacity: 0.8; } 100% { width: 500px; height: 500px; opacity: 0; } }
+        /* La poitrine orange caractéristique */
+        .chest {
+            position: absolute;
+            bottom: 5px;
+            width: 78px;
+            height: 78px;
+            background-color: var(--bird-orange);
+            border-radius: 50%;
+        }
 
-        .z { position: absolute; color: var(--accent); font-weight: bold; opacity: 0; animation: sleepZUnify 4s infinite linear; }
-        @keyframes sleepZUnify { 0% { opacity: 0; transform: translate(-20px, -20px) scale(0.5); } 20% { opacity: 0.8; } 100% { opacity: 0; transform: translate(60px, -180px) scale(1.5) rotate(20deg); } }
+        /* Les yeux noirs */
+        .eyes {
+            position: absolute;
+            top: 38px;
+            width: 42px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 3;
+        }
 
-        /* CONTROLES */
-        .control-group { text-align: left; margin-top: 15px; }
-        .label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; display: block; }
-        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; outline: none; appearance: none; cursor: pointer; }
-        input[type=range] { width: 100%; height: 6px; appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; }
-        input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
+        .eye {
+            width: 8px;
+            height: 8px;
+            background-color: #222;
+            border-radius: 50%;
+        }
+
+        /* Le petit bec jaune */
+        .beak {
+            position: absolute;
+            top: 44px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 7px solid #fbc531;
+            z-index: 4;
+        }
+
+        /* Les petites pattes posées */
+        .legs {
+            position: absolute;
+            bottom: -4px;
+            width: 40px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .leg {
+            width: 10px;
+            height: 12px;
+            background-color: var(--bird-dark-grey);
+            border-radius: 3px;
+        }
+
+        /* La queue de Bobby sous la branche */
+        .tail {
+            width: 28px;
+            height: 45px;
+            background-color: var(--bird-grey);
+            border-radius: 12px;
+            position: absolute;
+            bottom: -55px;
+            z-index: 0; /* Passe derrière la branche */
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="anim-container">
-            <div id="waveLayer" class="wave-emitter">
-                <div class="circle" style="animation-delay:0s"></div>
-                <div class="circle" style="animation-delay:1.3s"></div>
-                <div class="circle" style="animation-delay:2.6s"></div>
+    <div class="canvas">
+        <div class="bird">
+            <div class="body">
+                <div class="head-top"></div>
+                <div class="chest"></div>
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="beak"></div>
             </div>
-            <div id="zzzLayer" class="zzz-emitter">
-                <div class="z" style="animation-delay:0s; font-size:1.5rem">Z</div>
-                <div class="z" style="animation-delay:1.5s; font-size:2.2rem">Z</div>
-                <div class="z" style="animation-delay:3s; font-size:3rem">Z</div>
+            <div class="legs">
+                <div class="leg"></div>
+                <div class="leg"></div>
             </div>
+            <div class="tail"></div>
         </div>
-
-        <div class="card">
-            <h1>Sleepy Bobby</h1>
-            <p>Bobby murmure pour t'aider à dormir</p>
-            
-            <div class="play-btn-wrapper">
-                <button id="playBtn" class="play-btn">
-                    <div class="bobby-icon">
-                        <div class="bobby-face">
-                            <div class="eye-container">
-                                <div class="eye"></div>
-                                <div class="eye"></div>
-                            </div>
-                            <div class="beak"></div>
-                        </div>
-                        <div class="red-patch"></div>
-                    </div>
-                </button>
-            </div>
-
-            <div class="control-group">
-                <span class="label">Ambiance</span>
-                <select id="modeSelect">
-                    <option value="river" selected>Rivière Douce</option>
-                    <option value="pink">Bruit Rose (Sédatif)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <span class="label">Minuteur</span>
-                <select id="timerSelect">
-                    <option value="0" data-label="Infini">Infini</option>
-                    <option value="15" data-label="15 Minutes">15 Minutes</option>
-                    <option value="30" data-label="30 Minutes">30 Minutes</option>
-                    <option value="60" data-label="1 Heure">1 Heure</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <span class="label">Volume <span id="volPerc">100%</span></span>
-                <input type="range" id="volume" min="0" max="1" step="0.01" value="1.0">
-            </div>
-        </div>
+        
+        <div class="branch"></div>
     </div>
 
-    <script>
-        let audioCtx, sourceNode, gainNode, timerInterval;
-        let isPlaying = false;
-
-        const btn = document.getElementById('playBtn');
-        const modeSelect = document.getElementById('modeSelect');
-        const timerSelect = document.getElementById('timerSelect');
-        const volSlider = document.getElementById('volume');
-        const waveLayer = document.getElementById('waveLayer');
-        const zzzLayer = document.getElementById('zzzLayer');
-
-        function createRiverBuffer(ctx) {
-            const buf = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
-            const d = buf.getChannelData(0);
-            let lp0 = 0, lp1 = 0;
-            for (let i = 0; i < d.length; i++) {
-                const w = Math.random() * 2 - 1;
-                lp0 = 0.95 * lp0 + 0.05 * w;
-                lp1 = 0.95 * lp1 + 0.05 * lp0;
-                d[i] = lp1 * (Math.sin(i * 0.00004) * 0.2 + 0.8) * 3.5;
-            }
-            return buf;
-        }
-
-        function createPinkNoiseBuffer(ctx) {
-            const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-            const d = buf.getChannelData(0);
-            let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
-            for (let i = 0; i < d.length; i++) {
-                let w = Math.random() * 2 - 1;
-                b0 = 0.99886*b0 + w*0.0555179; b1 = 0.99332*b1 + w*0.0750759;
-                b2 = 0.96900*b2 + w*0.1538520; b3 = 0.86650*b3 + w*0.3104856;
-                b4 = 0.55000*b4 + w*0.5329522; b5 = -0.7616*b5 - w*0.0168980;
-                d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w*0.5362) * 0.12;
-                b6 = w * 0.11592;
-            }
-            return buf;
-        }
-
-        function updateAnims() {
-            waveLayer.classList.toggle('active', isPlaying && modeSelect.value === 'river');
-            zzzLayer.classList.toggle('active', isPlaying && modeSelect.value === 'pink');
-        }
-
-        function startTimer(minutes) {
-            resetTimerLabels();
-            if (minutes === 0) return;
-            let timeLeft = minutes * 60;
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const opt = timerSelect.options[timerSelect.selectedIndex];
-                const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                opt.textContent = `⏳ ${m}:${s.toString().padStart(2, '0')}`;
-                if (timeLeft <= 0) {
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 5);
-                    setTimeout(() => { if (isPlaying) togglePlay(); }, 5000);
-                }
-            }, 1000);
-        }
-
-        function resetTimerLabels() {
-            clearInterval(timerInterval);
-            Array.from(timerSelect.options).forEach(opt => opt.textContent = opt.getAttribute('data-label'));
-        }
-
-        async function togglePlay() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (!isPlaying) {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                sourceNode = audioCtx.createBufferSource();
-                sourceNode.buffer = (modeSelect.value === 'river') ? createRiverBuffer(audioCtx) : createPinkNoiseBuffer(audioCtx);
-                sourceNode.loop = true;
-                gainNode = audioCtx.createGain();
-                gainNode.gain.value = volSlider.value;
-                sourceNode.connect(gainNode).connect(audioCtx.destination);
-                sourceNode.start();
-                btn.classList.add('playing');
-                isPlaying = true;
-                startTimer(parseInt(timerSelect.value));
-            } else {
-                if(sourceNode) sourceNode.stop();
-                resetTimerLabels();
-                btn.classList.remove('playing');
-                isPlaying = false;
-            }
-            updateAnims();
-        }
-
-        btn.addEventListener('click', togglePlay);
-        modeSelect.addEventListener('change', () => { if (isPlaying) { togglePlay(); togglePlay(); } });
-        timerSelect.addEventListener('change', () => { if (isPlaying) startTimer(parseInt(timerSelect.value)); });
-        volSlider.addEventListener('input', (e) => {
-            document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
-            if (gainNode) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
-        });
-    </script>
 </body>
 </html>
