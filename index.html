@@ -93,9 +93,9 @@
             font-size: 2rem; opacity: 0; animation: sleepZ 3s infinite;
             bottom: 50%; left: 50%;
         }
-        .z:nth-child(1) { animation-delay: 0s; transform: translate(20px, -20px); }
-        .z:nth-child(2) { animation-delay: 1s; transform: translate(40px, -40px); font-size: 2.5rem; }
-        .z:nth-child(3) { animation-delay: 2s; transform: translate(60px, -60px); font-size: 3rem; }
+        .z:nth-child(1) { animation-delay: 0s; }
+        .z:nth-child(2) { animation-delay: 1s; font-size: 2.5rem; }
+        .z:nth-child(3) { animation-delay: 2s; font-size: 3rem; }
 
         @keyframes sleepZ {
             0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
@@ -188,10 +188,12 @@
             let lp0 = 0, lp1 = 0;
             for (let i = 0; i < bufferSize; i++) {
                 const white = Math.random() * 2 - 1;
-                lp0 = 0.96 * lp0 + 0.04 * white;
-                lp1 = 0.96 * lp1 + 0.04 * lp0;
-                const lfo = Math.sin(i * 0.00004) * 0.15 + 0.85; 
-                data[i] = lp1 * lfo * 1.8;
+                // Filtre légèrement plus ouvert (0.05) pour plus de clarté
+                lp0 = 0.95 * lp0 + 0.05 * white;
+                lp1 = 0.95 * lp1 + 0.05 * lp0;
+                const lfo = Math.sin(i * 0.00004) * 0.2 + 0.8; 
+                // Gain boosté à 3.5 pour une rivière bien audible
+                data[i] = lp1 * lfo * 3.5;
             }
             return buffer;
         }
