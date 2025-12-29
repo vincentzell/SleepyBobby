@@ -11,8 +11,10 @@
             --primary: #38bdf8;
             --accent: #fb7185;
             --text: #f8fafc;
-            --bobby-white: #ffffff;
-            --bobby-orange: #ff7043;
+            --wave-color: rgba(56, 189, 248, 0.2);
+            /* Couleurs Bobby Authentiques */
+            --bobby-brown: #5d4037; /* Marron plumage */
+            --bobby-red: #e64a19;   /* Rouge orangé authentique */
             --bobby-beak: #ffa726;
         }
 
@@ -40,55 +42,47 @@
 
         .bobby-icon {
             position: relative; width: 80px; height: 80px;
-            background: var(--bobby-white); border-radius: 22px;
+            background: var(--bobby-brown); border-radius: 22px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             display: flex; align-items: center; justify-content: center;
             overflow: hidden; transition: transform 0.3s ease;
         }
 
-        .bobby-face { position: relative; width: 50px; height: 45px; display: flex; flex-direction: column; align-items: center; }
-        .eye-container { display: flex; gap: 12px; margin-top: 5px; }
-        .eye { width: 8px; height: 8px; background: #333; border-radius: 50%; transition: all 0.4s ease; }
-        .beak { width: 0; height: 0; margin-top: 4px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--bobby-beak); }
-        .orange-patch { position: absolute; bottom: -10px; width: 100%; height: 20px; background: var(--bobby-orange); border-radius: 50% 50% 0 0; }
+        .bobby-face { position: relative; width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+        
+        .eye-container { display: flex; gap: 14px; margin-top: 8px; }
+        .eye { width: 8px; height: 8px; background: #1a1a1a; border-radius: 50%; transition: all 0.4s ease; }
+        
+        .beak { width: 0; height: 0; margin-top: 5px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--bobby-beak); }
+
+        /* Plastron rouge remonté */
+        .red-patch { 
+            position: absolute; 
+            top: 25px; /* Remonté pour entourer le bec */
+            width: 100%; height: 60px; 
+            background: var(--bobby-red); 
+            border-radius: 50% 50% 0 0;
+            z-index: 1;
+        }
 
         .play-btn.playing .bobby-icon { animation: breathe 4s ease-in-out infinite; }
-        .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 8px; }
+        .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 11px; }
 
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
-        /* --- ANIMATIONS UNIFIÉES (ÉMANENT DE BOBBY) --- */
-        .anim-container {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; height: 100%; pointer-events: none; z-index: 25;
-        }
+        /* --- ANIMATIONS ÉMANANT DE BOBBY --- */
+        .anim-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; pointer-events: none; z-index: 25; }
 
-        /* VAGUES (RIVIÈRE) */
-        .wave-emitter { position: absolute; top: 50%; left: 50%; opacity: 0; transition: opacity 0.5s; }
-        .wave-emitter.active { opacity: 1; }
-        .circle {
-            position: absolute; border: 2px solid var(--primary); border-radius: 50%;
-            transform: translate(-50%, -50%); animation: rippleUnify 4s linear infinite;
-        }
-        @keyframes rippleUnify {
-            0% { width: 80px; height: 80px; opacity: 0.8; }
-            100% { width: 500px; height: 500px; opacity: 0; }
-        }
+        .wave-emitter, .zzz-emitter { position: absolute; top: 50%; left: 50%; opacity: 0; transition: opacity 0.5s; }
+        .wave-emitter.active, .zzz-emitter.active { opacity: 1; }
 
-        /* ZZZ (BRUIT ROSE) */
-        .zzz-emitter { position: absolute; top: 50%; left: 50%; opacity: 0; transition: opacity 0.5s; }
-        .zzz-emitter.active { opacity: 1; }
-        .z {
-            position: absolute; color: var(--accent); font-weight: bold; opacity: 0;
-            animation: sleepZUnify 4s infinite linear;
-        }
-        @keyframes sleepZUnify {
-            0% { opacity: 0; transform: translate(-20px, -20px) scale(0.5); }
-            20% { opacity: 0.8; }
-            100% { opacity: 0; transform: translate(60px, -180px) scale(1.5) rotate(20deg); }
-        }
+        .circle { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleUnify 4s linear infinite; }
+        @keyframes rippleUnify { 0% { width: 80px; height: 80px; opacity: 0.8; } 100% { width: 500px; height: 500px; opacity: 0; } }
 
-        /* INTERFACE */
+        .z { position: absolute; color: var(--accent); font-weight: bold; opacity: 0; animation: sleepZUnify 4s infinite linear; }
+        @keyframes sleepZUnify { 0% { opacity: 0; transform: translate(-20px, -20px) scale(0.5); } 20% { opacity: 0.8; } 100% { opacity: 0; transform: translate(60px, -180px) scale(1.5) rotate(20deg); } }
+
+        /* CONTROLES */
         .control-group { text-align: left; margin-top: 15px; }
         .label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; display: block; }
         select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; outline: none; appearance: none; cursor: pointer; }
@@ -126,7 +120,7 @@
                             </div>
                             <div class="beak"></div>
                         </div>
-                        <div class="orange-patch"></div>
+                        <div class="red-patch"></div>
                     </div>
                 </button>
             </div>
