@@ -1,6 +1,6 @@
 {
   "name": "Sleepy Bobby",
-  "short_name": "Bobby",
+  "short_name": "Sleepy Bobby",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
