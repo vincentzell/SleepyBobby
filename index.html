@@ -41,19 +41,28 @@
         .zzz { position: absolute; color: #fb7185; font-weight: bold; opacity: 0; animation: zMove 3s ease-out forwards; font-size: 32px; left: 50%; top: 35%; }
         @keyframes zMove { 0% { transform: translate(20px, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(1.5); opacity: 0; } }
         
-        .bubble { position: absolute; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; animation: bubbleUp 6s ease-in forwards; pointer-events: none; }
-        @keyframes bubbleUp { 0% { transform: translateY(0) scale(0.3); opacity: 0; } 20% { opacity: 0.3; } 100% { transform: translateY(-110vh) scale(1.1); opacity: 0; } }
+        /* BULLES RUISSEAU (Visibilité accrue) */
+        .bubble { 
+            position: absolute; 
+            background: rgba(255, 255, 255, 0.25); 
+            border: 1.5px solid rgba(255, 255, 255, 0.4); 
+            border-radius: 50%; 
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+            animation: bubbleUp 6s ease-in forwards; 
+            pointer-events: none; 
+        }
+        @keyframes bubbleUp { 
+            0% { transform: translateY(0) scale(0.3); opacity: 0; } 
+            15% { opacity: 0.6; } 
+            100% { transform: translateY(-110vh) scale(1.3); opacity: 0; } 
+        }
 
         .wave-line { position: absolute; left: 0; width: 100%; height: 20px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.25), transparent); filter: blur(10px); opacity: 0; animation: waveFlow 10s ease-in-out infinite; }
         .wave-2 { animation-delay: 1.2s; height: 15px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent); }
         @keyframes waveFlow { 0% { bottom: -25%; opacity: 0; } 48% { bottom: 85%; opacity: 0.5; } 52% { bottom: 85%; opacity: 0.5; } 100% { bottom: -25%; opacity: 0; } }
 
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0; top: 50%; left: 50%; transform-origin: center; animation: starTravel 5s linear infinite, twinkle 1s infinite alternate; }
-        @keyframes starTravel {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: var(--travel-dest) scale(1.5); opacity: 0; }
-        }
+        @keyframes starTravel { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: var(--travel-dest) scale(1.5); opacity: 0; } }
         @keyframes twinkle { from { filter: brightness(0.8); } to { filter: brightness(1.5) drop-shadow(0 0 2px white); } }
 
         .wind-gust { position: absolute; height: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); filter: blur(15px); border-radius: 50%; animation: drift 7s ease-in-out forwards; }
@@ -129,7 +138,7 @@
                 const w = Math.random() * 2 - 1;
                 lp = 0.985 * lp + 0.015 * w; 
                 hp = w - (0.95 * hp); 
-                d[i] = (lp + (hp * 0.02) + Math.sin(i * 0.01) * 0.002) * 3.2;
+                d[i] = (lp + (hp * 0.015) + Math.sin(i * 0.01) * 0.002) * 3.2;
             }
             const fade = ctx.sampleRate * 2;
             for(let i=0; i<fade; i++) {
@@ -161,12 +170,12 @@
             filter.type = "lowpass";
 
             if (mode === 'stream') {
-                filter.frequency.value = 1400; // Plus doux (avant 1800)
+                filter.frequency.value = 1300; 
                 const streamMod = audioCtx.createGain();
                 const modulator = audioCtx.createOscillator();
-                modulator.frequency.value = 0.12; 
+                modulator.frequency.value = 0.1; 
                 const depth = audioCtx.createGain();
-                depth.gain.value = 0.08; // Variations plus subtiles
+                depth.gain.value = 0.08; 
                 modulator.connect(depth).connect(streamMod.gain);
                 streamMod.gain.value = 0.95;
                 sourceNode.connect(filter).connect(streamMod).connect(gainNode);
@@ -175,7 +184,7 @@
             } else if (mode === 'waves') { 
                 filter.frequency.value = 800; const waveGain = audioCtx.createGain(); const constantGain = audioCtx.createGain(); constantGain.gain.value = 0.15; lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.1; lfo.connect(waveGain.gain); sourceNode.connect(filter); filter.connect(waveGain).connect(gainNode); filter.connect(constantGain).connect(gainNode); lfo.start(); 
             } else { 
-                filter.frequency.value = (mode==='fire'? 3000 : mode==='wind'?300 : mode==='space'?150 : mode==='rain'?1500 : mode==='river'?1200 : 2500); sourceNode.connect(filter).connect(gainNode); 
+                filter.frequency.value = (mode==='fire'? 3000 : mode==='wind'?300 : mode==='space'?150 : mode==='rain'?1500 : mode==='river'?1100 : 2500); sourceNode.connect(filter).connect(gainNode); 
             }
             gainNode.connect(audioCtx.destination); sourceNode.start();
         }
@@ -202,8 +211,9 @@
                 if (mode === 'pink') { let z = document.createElement('div'); z.className = 'zzz'; z.textContent = 'z'; front.appendChild(z); setTimeout(() => z.remove(), 3000); } 
                 else if (mode === 'stream') { 
                     let b = document.createElement('div'); b.className = 'bubble'; 
-                    b.style.left = (Math.random()*100)+'%'; b.style.bottom = "-20px"; 
-                    b.style.width = b.style.height = (8 + Math.random()*15)+'px'; 
+                    b.style.left = (Math.random()*100)+'%'; b.style.bottom = "-30px"; 
+                    let size = (12 + Math.random()*15)+'px';
+                    b.style.width = size; b.style.height = size; 
                     back.appendChild(b); setTimeout(() => b.remove(), 6000); 
                 } 
                 else if (mode === 'river') {
@@ -211,7 +221,7 @@
                 }
                 else if (mode === 'wind') { bobby.classList.add('sway-active'); let g = document.createElement('div'); g.className = 'wind-gust'; g.style.top = Math.random()*100+'%'; g.style.width = (450+Math.random()*400)+'px'; front.appendChild(g); setTimeout(() => g.remove(), 7000); } 
                 else if (mode === 'fire') { const intense = 0.6 + Math.random() * 0.6; chest.style.filter = `brightness(${intense}) saturate(1.6)`; body.style.boxShadow = `0 0 ${25 + intense * 35}px rgba(230, 90, 40, ${0.3 + intense * 0.3})`; }
-            }, 1000);
+            }, 800); // Fréquence des bulles augmentée pour plus de vie
         }
 
         document.getElementById('playBtn').addEventListener('click', () => { if (!isPlaying) startBobby(); else stopBobby(); });
