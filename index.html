@@ -12,10 +12,9 @@
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); font-family: system-ui, sans-serif; color: var(--text); }
         body { display: flex; align-items: center; justify-content: center; }
 
-        /* Conteneurs d'animations */
         .anim-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-        #bgAnimContainer { z-index: 1; } /* DERRIÈRE LA CARTE */
-        #animContainer { z-index: 999; }   /* DEVANT LA CARTE */
+        #bgAnimContainer { z-index: 1; } 
+        #animContainer { z-index: 999; }
 
         .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
         .card { background: var(--card); padding: 2rem; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
@@ -41,8 +40,18 @@
         /* --- EFFETS VISUELS --- */
         .zzz { position: absolute; color: #fb7185; font-weight: bold; opacity: 0; animation: zMove 3s ease-out forwards; font-size: 32px; left: 50%; top: 35%; }
         @keyframes zMove { 0% { transform: translate(20px, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(1.5); opacity: 0; } }
-        .wave-line { position: absolute; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--primary), transparent); opacity: 0; animation: waveFlow 8s ease-in-out forwards; }
-        @keyframes waveFlow { 0% { bottom: -5%; opacity: 0; } 50% { opacity: 0.4; } 100% { bottom: 105%; opacity: 0; } }
+        
+        /* VAGUES : SYNCHRONISÉES ET PROFONDES */
+        .wave-line { position: absolute; left: 0; width: 100%; height: 20px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.25), transparent); filter: blur(10px); opacity: 0; animation: waveFlow 10s ease-in-out infinite; }
+        .wave-2 { animation-delay: 1.2s; height: 15px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent); }
+
+        @keyframes waveFlow { 
+            0% { bottom: -25%; opacity: 0; } 
+            48% { bottom: 85%; opacity: 0.5; } /* Monte plus haut que la carte */
+            52% { bottom: 85%; opacity: 0.5; } /* Pause très brève (4%) */
+            100% { bottom: -25%; opacity: 0; } 
+        }
+
         .wind-gust { position: absolute; height: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); filter: blur(15px); border-radius: 50%; animation: drift 7s ease-in-out forwards; }
         @keyframes drift { from { left: -120%; } to { left: 120%; } }
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 4s infinite; }
@@ -60,7 +69,9 @@
     </style>
 </head>
 <body>
-    <div class="anim-container" id="bgAnimContainer"></div> <div class="anim-container" id="animContainer"></div>   <div class="container">
+    <div class="anim-container" id="bgAnimContainer"></div> 
+    <div class="anim-container" id="animContainer"></div>   
+    <div class="container">
         <div class="card">
             <h2 style="margin:0;">Sleepy Bobby</h2>
             <p id="bobbyPhrase" style="min-height:50px; font-size: 0.95rem; font-style: italic; margin: 10px 0; display: flex; align-items: center; justify-content: center;"></p>
@@ -138,9 +149,7 @@
 
         function resetTimerLabels() {
             const select = document.getElementById('timerSelect');
-            Array.from(select.options).forEach(opt => {
-                opt.text = opt.getAttribute('data-base');
-            });
+            Array.from(select.options).forEach(opt => { opt.text = opt.getAttribute('data-base'); });
         }
 
         function createRiverBuffer(ctx) {
@@ -195,7 +204,7 @@
                 const constantGain = audioCtx.createGain();
                 constantGain.gain.value = 0.15;
                 lfo = audioCtx.createOscillator();
-                lfo.frequency.value = 0.12;
+                lfo.frequency.value = 0.1; 
                 lfo.connect(waveGain.gain);
                 sourceNode.connect(filter);
                 filter.connect(waveGain).connect(gainNode);
@@ -227,7 +236,6 @@
         async function startBobby() {
             clearInterval(countdownInterval);
             resetTimerLabels();
-            
             isPlaying = true;
             displayNewPhrase();
             document.getElementById('bobbyBox').classList.add('playing');
@@ -242,7 +250,6 @@
                     timeLeft--;
                     let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
                     select.options[select.selectedIndex].text = `${m}:${s < 10 ? '0' : ''}${s} restant`;
-                    
                     if (timeLeft <= 30 && timeLeft > 0) {
                         let fade = (timeLeft / 30) * document.getElementById('volume').value;
                         if(gainNode) gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5);
@@ -260,8 +267,7 @@
             const chest = document.getElementById('bChest');
             const mainBody = document.getElementById('birdMain');
             
-            frontAnim.innerHTML = ''; 
-            backAnim.innerHTML = ''; 
+            frontAnim.innerHTML = ''; backAnim.innerHTML = ''; 
             clearInterval(visualInterval);
             bobby.classList.remove('sway-active');
             chest.style.filter = "none";
@@ -282,16 +288,17 @@
                     s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
                     backAnim.appendChild(s);
                 }
+            } else if (mode === 'waves') {
+                let w1 = document.createElement('div'); w1.className = 'wave-line';
+                backAnim.appendChild(w1);
+                let w2 = document.createElement('div'); w2.className = 'wave-line wave-2';
+                backAnim.appendChild(w2);
             }
 
             visualInterval = setInterval(() => {
                 if (mode === 'pink') {
                     let z = document.createElement('div'); z.className = 'zzz'; z.textContent = 'z';
                     frontAnim.appendChild(z); setTimeout(() => z.remove(), 3000);
-                } else if (mode === 'waves') {
-                    let w = document.createElement('div'); w.className = 'wave-line';
-                    backAnim.appendChild(w);
-                    setTimeout(() => w.remove(), 8000);
                 } else if (mode === 'river') {
                     let r = document.createElement('div'); r.className = 'ripple';
                     r.style.left = (30 + Math.random() * 40) + '%';
@@ -315,14 +322,8 @@
             if (!isPlaying) startBobby(); else stopBobby();
         });
 
-        document.getElementById('modeSelect').addEventListener('change', () => {
-            if (isPlaying) startBobby();
-        });
-
-        document.getElementById('timerSelect').addEventListener('change', () => {
-            if (isPlaying) startBobby();
-        });
-
+        document.getElementById('modeSelect').addEventListener('change', () => { if (isPlaying) startBobby(); });
+        document.getElementById('timerSelect').addEventListener('change', () => { if (isPlaying) startBobby(); });
         document.getElementById('volume').addEventListener('input', (e) => {
             document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
             if(gainNode && isPlaying) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1);
