@@ -4,55 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sleepy Bobby</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
-
     <style>
         :root {
             --bg: #0f172a;
             --card: #1e293b;
             --text: #f8fafc;
             --primary: #38bdf8;
-            --accent: #fb7185;
             --bird-grey: #b8b0a5;
             --bird-dark-grey: #8d7e71;
             --bird-orange: #e65a28;
             --branch-brown: #8b5d43;
         }
 
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); font-family: system-ui, sans-serif; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); font-family: system-ui, sans-serif; color: var(--text); }
         body { display: flex; align-items: center; justify-content: center; }
 
-        /* Calque d'animation au premier plan */
+        /* Visuels au premier plan */
         .anim-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 100; overflow: hidden; }
         
         .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
+        .card { background: var(--card); padding: 2.5rem 2rem; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); position: relative; z-index: 20; }
 
-        .card {
-            background: var(--card); padding: 2.5rem 2rem; border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px); position: relative; z-index: 20; color: var(--text);
-        }
-
-        /* --- BOBBY --- */
-        .play-btn-wrapper { position: relative; margin: 10px auto 30px; width: 160px; height: 150px; display: flex; justify-content: center; align-items: center; }
-        .play-btn { width: 140px; height: 140px; border: none; background: none; cursor: pointer; position: relative; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; outline: none; }
+        /* --- BOBBY (Corps complet) --- */
+        .play-btn-wrapper { position: relative; margin: 10px auto 30px; width: 160px; height: 160px; display: flex; justify-content: center; align-items: center; }
+        .play-btn { width: 140px; height: 150px; border: none; background: none; cursor: pointer; position: relative; z-index: 60; outline: none; }
         
-        .branch { position: absolute; width: 140px; height: 12px; background: var(--branch-brown); bottom: 35px; left: 50%; transform: translateX(-50%); border-radius: 10px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: relative; overflow: hidden; z-index: 30; }
-        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; transition: background 0.3s; }
+        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: absolute; left: 25px; top: 10px; z-index: 30; overflow: hidden; }
+        .head-top { position: absolute; top: 0; left: 20%; width: 60%; height: 25px; background: var(--bird-dark-grey); border-radius: 0 0 15px 15px; }
+        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; }
         .eyes { position: absolute; top: 35px; width: 45px; display: flex; justify-content: space-between; left: 50%; transform: translateX(-50%); }
         .eye { width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%; transition: all 0.3s; }
+        .beak { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #f1c40f; }
         
-        /* Animations */
+        .tail { width: 25px; height: 40px; background: var(--bird-grey); border-radius: 0 0 10px 10px; position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 10; }
+        .legs { display: flex; justify-content: center; gap: 15px; position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%); z-index: 40; }
+        .leg { width: 8px; height: 12px; background: var(--bird-dark-grey); border-radius: 3px; }
+        .branch { position: absolute; width: 140px; height: 12px; background: var(--branch-brown); bottom: 35px; left: 0; border-radius: 10px; z-index: 50; }
+
         .play-btn.playing .bird-body { animation: breathe 4s ease-in-out infinite; }
         .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 3px; }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
-        /* Visuels Pluie/Rivière */
-        .ripple { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleEffect 4s cubic-bezier(0, 0.3, 0.7, 1) forwards; opacity: 0; }
+        /* Visuels */
+        .ripple { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleEffect 4s forwards; opacity: 0; }
         @keyframes rippleEffect { 0% { width: 0; height: 0; opacity: 0.6; } 100% { width: 400px; height: 400px; opacity: 0; } }
         .rain-drop { position: absolute; background: white; width: 1px; height: 25px; opacity: 0.2; animation: fall 0.6s linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
@@ -62,86 +56,68 @@
 
         .control-group { text-align: left; margin-top: 15px; }
         .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; display: block; }
-        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; appearance: none; cursor: pointer; outline: none; }
-        input[type=range] { width: 100%; height: 6px; appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid var(--card); }
+        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; appearance: none; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="anim-container" id="animContainer"></div>
-
     <div class="container">
         <div class="card">
-            <h1 style="margin:0;">Sleepy Bobby</h1>
+            <h1>Sleepy Bobby</h1>
             <p id="bobbyPhrase"></p>
-            
             <div class="play-btn-wrapper">
                 <button id="playBtn" class="play-btn">
+                    <div class="tail"></div>
                     <div class="bird-body">
-                        <div class="head-top" style="position:absolute;top:0;left:20%;width:60%;height:25px;background:var(--bird-dark-grey);border-radius:0 0 15px 15px;"></div>
-                        <div class="chest" id="bobbyChest"></div>
+                        <div class="head-top"></div>
+                        <div class="chest"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-                        <div class="beak" style="position:absolute;top:42px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #f1c40f;"></div>
+                        <div class="beak"></div>
                     </div>
+                    <div class="legs"><div class="leg"></div><div class="leg"></div></div>
                     <div class="branch"></div>
                 </button>
             </div>
-
             <div class="control-group">
                 <span class="label">Ambiance</span>
                 <select id="modeSelect">
-                    <option value="pink">Bruit Rose (Sommeil profond)</option>
-                    <option value="river">Rivière Douce</option>
-                    <option value="rain">Pluie (Dublin Rain)</option>
-                    <option value="wind">Vent (Pins Landais)</option>
-                    <option value="fire">Cheminée (Irish Cottage)</option>
-                    <option value="space">Espace (Zen)</option>
+                    <option value="pink">Bruit Rose</option>
+                    <option value="river">Rivière</option>
+                    <option value="rain">Pluie</option>
+                    <option value="wind">Vent</option>
+                    <option value="fire">Cheminée</option>
+                    <option value="space">Espace</option>
                 </select>
             </div>
-            
             <div class="control-group">
                 <span class="label">Minuteur</span>
                 <select id="timerSelect">
-                    <option value="0" data-label="Sans limite">∞</option>
-                    <option value="5" data-label="5 Minutes">5 Minutes</option>
-                    <option value="10" data-label="10 Minutes">10 Minutes</option>
-                    <option value="15" data-label="15 Minutes">15 Minutes</option>
-                    <option value="30" data-label="30 Minutes">30 Minutes</option>
-                    <option value="60" data-label="60 Minutes">60 Minutes</option>
+                    <option value="0" data-label="∞">∞</option>
+                    <option value="5" data-label="5 Min">5 Min</option>
+                    <option value="10" data-label="10 Min">10 Min</option>
+                    <option value="15" data-label="15 Min">15 Min</option>
+                    <option value="30" data-label="30 Min">30 Min</option>
+                    <option value="60" data-label="60 Min">60 Min</option>
                 </select>
             </div>
-
             <div class="control-group">
                 <span class="label">Volume <span id="volPerc">100%</span></span>
-                <input type="range" id="volume" min="0" max="1" step="0.01" value="1.0">
+                <input type="range" id="volume" min="0" max="1" step="0.01" value="1.0" style="width:100%">
             </div>
         </div>
     </div>
 
     <script>
-        const phrases = [
-            "Bobby ébouriffe ses plumes pour te border.",
-            "Chut... Bobby troque son chant contre un doux murmure.",
-            "Bobby says bonne nuit and wishes you sweet dreams.",
-            "Bobby rêve de trèfles irlandais et de jardins français.",
-            "Slán abhaile... Bobby te souhaite un doux retour au pays des songes.",
-            "Bobby has his head in the clouds, entre Dublin et Paris."
-        ];
-
+        const phrases = ["Bobby te borde...", "Chut... Bobby murmure.", "Goodnight from Bobby.", "Slán abhaile...", "Bobby rêve d'Irlande."];
         let audioCtx, gainNode, sourceNode, visualInterval, timerInterval;
         let isPlaying = false;
-        let fadeStarted = false;
-
-        const phraseElement = document.getElementById('bobbyPhrase');
-        const animContainer = document.getElementById('animContainer');
-        const timerSelect = document.getElementById('timerSelect');
 
         function updatePhrase() {
-            phraseElement.classList.add('phrase-fade');
+            const p = document.getElementById('bobbyPhrase');
+            p.classList.add('phrase-fade');
             setTimeout(() => {
-                phraseElement.textContent = phrases[Math.floor(Math.random() * phrases.length)];
-                phraseElement.classList.remove('phrase-fade');
+                p.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                p.classList.remove('phrase-fade');
             }, 400);
         }
         updatePhrase();
@@ -150,123 +126,72 @@
             const bufSize = audioCtx.sampleRate * 4;
             const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
             const d = buffer.getChannelData(0);
-            let b0=0, b1=0, b2=0, b3=0, b4=0;
-
+            let b0=0, b1=0, b2=0;
             for (let i = 0; i < bufSize; i++) {
-                let white = Math.random() * 2 - 1;
+                let w = Math.random() * 2 - 1;
                 if (type === 'pink') {
-                    b0 = 0.99886*b0+white*0.0555; b1 = 0.99332*b1+white*0.0750; b2 = 0.969*b2+white*0.1538;
-                    d[i] = (b0+b1+b2+white*0.53) * 0.15;
-                } else if (type === 'river') {
-                    b0 = 0.95*b0 + 0.05*white;
-                    d[i] = b0 * (Math.sin(i * 0.0001) * 0.3 + 0.7) * 2;
+                    b0 = 0.99886*b0+w*0.0555; b1 = 0.99332*b1+w*0.0750; b2 = 0.969*b2+w*0.1538;
+                    d[i] = (b0+b1+b2+w*0.53)*0.15;
                 } else if (type === 'fire') {
-                    d[i] = (Math.random() > 0.9985) ? (Math.random() * 0.6) : (white * 0.04);
-                } else {
-                    d[i] = white * 0.3;
-                }
+                    d[i] = (Math.random() > 0.9985) ? (Math.random()*0.6) : (w*0.04);
+                } else { d[i] = w * 0.3; }
             }
             return buffer;
-        }
-
-        function startAudio() {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            sourceNode = audioCtx.createBufferSource();
-            const mode = document.getElementById('modeSelect').value;
-            sourceNode.buffer = createAudioBuffer(mode);
-            sourceNode.loop = true;
-
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = "lowpass";
-            if (mode === 'rain') filter.frequency.value = 1300;
-            else if (mode === 'wind') filter.frequency.value = 350;
-            else if (mode === 'space') filter.frequency.value = 150;
-            else filter.frequency.value = 3000;
-
-            gainNode = audioCtx.createGain();
-            gainNode.gain.value = document.getElementById('volume').value;
-            sourceNode.connect(filter).connect(gainNode).connect(audioCtx.destination);
-            sourceNode.start();
-        }
-
-        function startTimer(minutes) {
-            clearInterval(timerInterval);
-            fadeStarted = false;
-            if (minutes === 0) return;
-            let timeLeft = minutes * 60;
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const opt = timerSelect.options[timerSelect.selectedIndex];
-                const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                opt.textContent = `⏳ ${m}:${s.toString().padStart(2, '0')}`;
-
-                if (timeLeft <= 30 && !fadeStarted && gainNode) {
-                    fadeStarted = true;
-                    const now = audioCtx.currentTime;
-                    gainNode.gain.cancelScheduledValues(now);
-                    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + timeLeft);
-                }
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    if (isPlaying) togglePlay();
-                }
-            }, 1000);
-        }
-
-        function resetTimerLabels() {
-            clearInterval(timerInterval);
-            Array.from(timerSelect.options).forEach(opt => opt.textContent = opt.getAttribute('data-label'));
-        }
-
-        function updateVisuals() {
-            animContainer.innerHTML = '';
-            clearInterval(visualInterval);
-            if (!isPlaying) return;
-            const mode = document.getElementById('modeSelect').value;
-
-            if (mode === 'river') {
-                visualInterval = setInterval(() => {
-                    const r = document.createElement('div');
-                    r.className = 'ripple';
-                    r.style.left = (Math.random() * 100) + '%';
-                    r.style.top = (Math.random() * 100) + '%';
-                    animContainer.appendChild(r);
-                    setTimeout(() => r.remove(), 4000);
-                }, 1200);
-            } else if (mode === 'rain') {
-                for(let i=0; i<40; i++) {
-                    const d = document.createElement('div');
-                    d.className = 'rain-drop';
-                    d.style.left = Math.random() * 100 + '%';
-                    d.style.animationDelay = Math.random() * 2 + 's';
-                    animContainer.appendChild(d);
-                }
-            }
         }
 
         function togglePlay() {
             if (!isPlaying) {
                 isPlaying = true;
                 updatePhrase();
-                startAudio();
-                startTimer(parseInt(timerSelect.value));
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                sourceNode = audioCtx.createBufferSource();
+                const mode = document.getElementById('modeSelect').value;
+                sourceNode.buffer = createAudioBuffer(mode);
+                sourceNode.loop = true;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = "lowpass";
+                filter.frequency.value = (mode==='wind'?350 : mode==='space'?150 : mode==='rain'?1300 : 3000);
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = document.getElementById('volume').value;
+                sourceNode.connect(filter).connect(gainNode).connect(audioCtx.destination);
+                sourceNode.start();
                 document.getElementById('playBtn').classList.add('playing');
+                
+                // Minuteur
+                let mins = parseInt(document.getElementById('timerSelect').value);
+                if(mins > 0) {
+                    let sec = mins * 60;
+                    timerInterval = setInterval(() => {
+                        sec--;
+                        let m = Math.floor(sec/60), s = sec%60;
+                        document.getElementById('timerSelect').options[document.getElementById('timerSelect').selectedIndex].textContent = `⏳ ${m}:${s<10?'0':''}${s}`;
+                        if(sec <= 0) togglePlay();
+                    }, 1000);
+                }
             } else {
                 isPlaying = false;
-                if(sourceNode) { try { sourceNode.stop(); } catch(e){} }
-                resetTimerLabels();
+                if(sourceNode) sourceNode.stop();
+                clearInterval(timerInterval);
+                const sel = document.getElementById('timerSelect');
+                Array.from(sel.options).forEach(o => o.textContent = o.getAttribute('data-label'));
                 document.getElementById('playBtn').classList.remove('playing');
             }
-            updateVisuals();
+            // Visuels
+            const anim = document.getElementById('animContainer');
+            anim.innerHTML = ''; clearInterval(visualInterval);
+            if(isPlaying && document.getElementById('modeSelect').value === 'rain') {
+                for(let i=0; i<30; i++) {
+                    let d = document.createElement('div'); d.className='rain-drop';
+                    d.style.left = Math.random()*100+'%'; d.style.animationDelay = Math.random()*2+'s';
+                    anim.appendChild(d);
+                }
+            }
         }
 
         document.getElementById('playBtn').addEventListener('click', togglePlay);
         document.getElementById('volume').addEventListener('input', (e) => {
             document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
-            if(gainNode && !fadeStarted) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1);
+            if(gainNode) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1);
         });
     </script>
 </body>
