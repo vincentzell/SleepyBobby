@@ -49,6 +49,9 @@
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         .rain-drop { position: absolute; background: rgba(255,255,255,0.3); width: 1px; height: 30px; animation: fall 0.8s linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
+        /* NOUVEAU : RIPPLES RIVIÈRE */
+        .ripple { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleEffect 4s cubic-bezier(0, 0.3, 0.7, 1) forwards; opacity: 0; }
+        @keyframes rippleEffect { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 500px; height: 500px; opacity: 0; } }
 
         /* --- UI --- */
         .label-row { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; text-transform: none; opacity: 0.7; margin-bottom: 5px; }
@@ -81,6 +84,7 @@
                 <div class="label-row"><span>Ambiance</span></div>
                 <select id="modeSelect">
                     <option value="pink">Bruit Rose</option>
+                    <option value="river">Rivière Douce</option>
                     <option value="waves">Vagues</option>
                     <option value="rain">Pluie</option>
                     <option value="wind">Vent</option>
@@ -139,6 +143,19 @@
             });
         }
 
+        function createRiverBuffer(ctx) {
+            const buf = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
+            const d = buf.getChannelData(0);
+            let lp0 = 0, lp1 = 0;
+            for (let i = 0; i < d.length; i++) {
+                const w = Math.random() * 2 - 1;
+                lp0 = 0.95 * lp0 + 0.05 * w;
+                lp1 = 0.95 * lp1 + 0.05 * lp0;
+                d[i] = lp1 * (Math.sin(i * 0.00004) * 0.2 + 0.8) * 3.5;
+            }
+            return buf;
+        }
+
         async function initAudio(mode) {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -146,22 +163,27 @@
             if(lfo) try { lfo.stop(); } catch(e) {}
 
             sourceNode = audioCtx.createBufferSource();
-            const bufferSize = audioCtx.sampleRate * 4;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
             
-            let b0=0, b1=0, b2=0; 
-            for (let i = 0; i < bufferSize; i++) {
-                let w = Math.random() * 2 - 1;
-                if (mode === 'fire') {
-                    data[i] = (Math.random() > 0.998) ? (Math.random() * 0.5) : (w * 0.04);
-                } else {
-                    b0 = 0.99886*b0 + w*0.0555; b1 = 0.99332*b1 + w*0.0750; b2 = 0.969*b2 + w*0.1538;
-                    data[i] = (b0 + b1 + b2 + w * 0.53) * 0.11;
+            if (mode === 'river') {
+                sourceNode.buffer = createRiverBuffer(audioCtx);
+            } else {
+                const bufferSize = audioCtx.sampleRate * 4;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                let b0=0, b1=0, b2=0; 
+                for (let i = 0; i < bufferSize; i++) {
+                    let w = Math.random() * 2 - 1;
+                    if (mode === 'fire') {
+                        data[i] = (Math.random() > 0.998) ? (Math.random() * 0.5) : (w * 0.04);
+                    } else {
+                        b0 = 0.99886*b0 + w*0.0555; b1 = 0.99332*b1 + w*0.0750; b2 = 0.969*b2 + w*0.1538;
+                        data[i] = (b0 + b1 + b2 + w * 0.53) * 0.11;
+                    }
                 }
+                sourceNode.buffer = buffer;
             }
 
-            sourceNode.buffer = buffer; sourceNode.loop = true;
+            sourceNode.loop = true;
             gainNode = audioCtx.createGain();
             gainNode.gain.value = document.getElementById('volume').value;
             const filter = audioCtx.createBiquadFilter();
@@ -180,7 +202,7 @@
                 filter.connect(constantGain).connect(gainNode);
                 lfo.start();
             } else {
-                filter.frequency.value = (mode==='fire'? 3000 : mode==='wind'?300 : mode==='space'?150 : mode==='rain'?1500 : 2500);
+                filter.frequency.value = (mode==='fire'? 3000 : mode==='wind'?300 : mode==='space'?150 : mode==='rain'?1500 : mode==='river'?1200 : 2500);
                 sourceNode.connect(filter).connect(gainNode);
             }
             gainNode.connect(audioCtx.destination);
@@ -196,7 +218,7 @@
             clearInterval(visualInterval); 
             clearInterval(countdownInterval);
             document.getElementById('animContainer').innerHTML = '';
-            document.getElementById('bgAnimContainer').innerHTML = ''; // Clear back container
+            document.getElementById('bgAnimContainer').innerHTML = ''; 
             document.getElementById('birdMain').style.boxShadow = "none";
             document.getElementById('bChest').style.filter = "none";
             resetTimerLabels();
@@ -247,7 +269,6 @@
             
             if (!isPlaying) return;
 
-            // Logique de placement (Derrière vs Devant)
             if (mode === 'rain') {
                 for(let i=0; i<30; i++) {
                     let d = document.createElement('div'); d.className = 'rain-drop';
@@ -259,7 +280,7 @@
                     let s = document.createElement('div'); s.className = 'star';
                     s.style.width = s.style.height = Math.random()*3+'px';
                     s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
-                    backAnim.appendChild(s); // DERRIÈRE
+                    backAnim.appendChild(s);
                 }
             }
 
@@ -269,8 +290,14 @@
                     frontAnim.appendChild(z); setTimeout(() => z.remove(), 3000);
                 } else if (mode === 'waves') {
                     let w = document.createElement('div'); w.className = 'wave-line';
-                    backAnim.appendChild(w); // DERRIÈRE
+                    backAnim.appendChild(w);
                     setTimeout(() => w.remove(), 8000);
+                } else if (mode === 'river') {
+                    let r = document.createElement('div'); r.className = 'ripple';
+                    r.style.left = (30 + Math.random() * 40) + '%';
+                    r.style.top = (40 + Math.random() * 20) + '%';
+                    backAnim.appendChild(r);
+                    setTimeout(() => r.remove(), 4000);
                 } else if (mode === 'wind') {
                     bobby.classList.add('sway-active');
                     let g = document.createElement('div'); g.className = 'wind-gust';
@@ -293,7 +320,7 @@
         });
 
         document.getElementById('timerSelect').addEventListener('change', () => {
-            startBobby();
+            if (isPlaying) startBobby();
         });
 
         document.getElementById('volume').addEventListener('input', (e) => {
