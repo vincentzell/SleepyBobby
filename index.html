@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sleepy Bobby - Timer Pro</title>
+    <title>Sleepy Bobby - Clean UI</title>
     <style>
         :root {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8;
@@ -125,6 +125,18 @@
         let audioCtx, gainNode, sourceNode, visualInterval, countdownInterval, lfo;
         let isPlaying = false, timeLeft = 0;
 
+        function displayNewPhrase() {
+            document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
+        // --- NOUVELLE FONCTION : Remet les textes des options à zéro ---
+        function resetTimerLabels() {
+            const select = document.getElementById('timerSelect');
+            Array.from(select.options).forEach(opt => {
+                opt.text = opt.getAttribute('data-base');
+            });
+        }
+
         async function initAudio(mode) {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -184,13 +196,15 @@
             document.getElementById('animContainer').innerHTML = '';
             document.getElementById('birdMain').style.boxShadow = "none";
             document.getElementById('bChest').style.filter = "none";
-            const select = document.getElementById('timerSelect');
-            Array.from(select.options).forEach(opt => opt.text = opt.getAttribute('data-base'));
+            resetTimerLabels(); // Remise à zéro au stop
         }
 
         async function startBobby() {
+            clearInterval(countdownInterval);
+            resetTimerLabels(); // On nettoie les labels avant de commencer
+            
             isPlaying = true;
-            document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random()*phrases.length)];
+            displayNewPhrase();
             document.getElementById('bobbyBox').classList.add('playing');
             await initAudio(document.getElementById('modeSelect').value);
             updateVisuals();
@@ -203,9 +217,10 @@
                     timeLeft--;
                     let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
                     select.options[select.selectedIndex].text = `${m}:${s < 10 ? '0' : ''}${s} restant`;
+                    
                     if (timeLeft <= 30 && timeLeft > 0) {
                         let fade = (timeLeft / 30) * document.getElementById('volume').value;
-                        gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5);
+                        if(gainNode) gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5);
                     }
                     if (timeLeft <= 0) stopBobby();
                 }, 1000);
@@ -270,7 +285,6 @@
         });
 
         document.getElementById('timerSelect').addEventListener('change', () => {
-            stopBobby();
             startBobby();
         });
 
@@ -278,6 +292,8 @@
             document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
             if(gainNode && isPlaying) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1);
         });
+
+        displayNewPhrase();
     </script>
 </body>
 </html>
