@@ -38,9 +38,9 @@
         .play-btn { width: 140px; height: 140px; border: none; background: none; cursor: pointer; position: relative; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; outline: none; }
         
         .branch { position: absolute; width: 140px; height: 12px; background: var(--branch-brown); bottom: 35px; left: 50%; transform: translateX(-50%); border-radius: 10px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: relative; overflow: hidden; z-index: 30; }
+        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: relative; overflow: hidden; z-index: 30; transition: box-shadow 1s ease; }
         .head-top { position: absolute; top: 0; left: 20%; width: 60%; height: 25px; background: var(--bird-dark-grey); border-radius: 0 0 15px 15px; }
-        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; }
+        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; transition: background 0.5s ease; }
         .eyes { position: absolute; top: 35px; width: 45px; display: flex; justify-content: space-between; left: 50%; transform: translateX(-50%); }
         .eye { width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%; transition: all 0.3s ease; }
         .beak { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #f1c40f; }
@@ -48,28 +48,27 @@
         .leg { width: 8px; height: 12px; background: var(--bird-dark-grey); border-radius: 3px; }
         .tail { width: 25px; height: 40px; background: var(--bird-grey); border-radius: 0 0 10px 10px; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 10; }
 
-        /* Animations Bobby */
+        /* Animations */
         .play-btn.playing .bird-body { animation: breathe 4s ease-in-out infinite; }
         .play-btn.playing .eye { height: 2px; border-radius: 2px; margin-top: 3px; }
         .playing-state .branch { animation: sway 4s ease-in-out infinite; }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
         @keyframes sway { 0%, 100% { transform: translateX(-50%) rotate(0deg); } 50% { transform: translateX(-50%) rotate(1.5deg); } }
 
-        /* --- TEXTE & PHRASES --- */
-        #bobbyPhrase { 
-            min-height: 48px; 
-            margin: 0 0 20px 0; 
-            opacity: 0.7; 
-            font-size: 0.9rem; 
-            line-height: 1.4;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
+        /* Effet spécial Feu */
+        .glow-fire { box-shadow: 0 0 20px rgba(230, 90, 40, 0.6); }
+
+        /* --- TEXTE --- */
+        #bobbyPhrase { min-height: 48px; margin: 0 0 20px 0; opacity: 0.7; font-size: 0.9rem; line-height: 1.4; transition: opacity 0.4s ease, transform 0.4s ease; }
         .phrase-fade { opacity: 0 !important; transform: translateY(5px); }
 
-        /* --- RIPPLES --- */
-        .anim-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 150; overflow: hidden; }
+        /* --- VISUELS --- */
+        .anim-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; overflow: hidden; }
         .ripple { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleEffect 4s cubic-bezier(0, 0.3, 0.7, 1) forwards; opacity: 0; }
-        @keyframes rippleEffect { 0% { width: 0; height: 0; opacity: 0.6; } 100% { width: 600px; height: 600px; opacity: 0; } }
+        @keyframes rippleEffect { 0% { width: 0; height: 0; opacity: 0.6; } 100% { width: 400px; height: 400px; opacity: 0; } }
+        
+        .rain-drop { position: absolute; background: var(--primary); width: 2px; height: 15px; opacity: 0.4; animation: fall 0.8s linear infinite; }
+        @keyframes fall { to { transform: translateY(100vh); } }
 
         /* CONTROLES */
         .control-group { text-align: left; margin-top: 15px; }
@@ -90,8 +89,8 @@
             
             <div class="play-btn-wrapper">
                 <button id="playBtn" class="play-btn">
-                    <div class="bird-body">
-                        <div class="head-top"></div><div class="chest"></div>
+                    <div class="bird-body" id="bobbyBody">
+                        <div class="head-top"></div><div class="chest" id="bobbyChest"></div>
                         <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                         <div class="beak"></div>
                     </div>
@@ -104,8 +103,11 @@
             <div class="control-group">
                 <span class="label">Ambiance</span>
                 <select id="modeSelect">
-                    <option value="river" selected>Rivière Douce</option>
-                    <option value="pink">Bruit Rose</option>
+                    <option value="river">Rivière Douce</option>
+                    <option value="rain">Pluie (Dublin Rain)</option>
+                    <option value="wind">Vent (Pins Landais)</option>
+                    <option value="fire">Cheminée (Irish Cottage)</option>
+                    <option value="space">Espace (Head in Clouds)</option>
                 </select>
             </div>
             
@@ -113,11 +115,8 @@
                 <span class="label">Minuteur</span>
                 <select id="timerSelect">
                     <option value="0" data-label="∞">∞</option>
-                    <option value="5" data-label="5 Minutes">5 Minutes</option>
                     <option value="10" data-label="10 Minutes">10 Minutes</option>
-                    <option value="15" data-label="15 Minutes">15 Minutes</option>
                     <option value="30" data-label="30 Minutes">30 Minutes</option>
-                    <option value="60" data-label="60 Minutes">60 Minutes</option>
                 </select>
             </div>
 
@@ -132,133 +131,130 @@
         const phrases = [
             "Bobby ébouriffe ses plumes pour te border.",
             "Chut... Bobby troque son chant contre un doux murmure.",
-            "Un petit nid de sons pour une grande nuit de rêves.",
-            "Bobby ferme un œil... puis l'autre... avec toi.",
             "Bobby says bonne nuit and wishes you sweet dreams.",
-            "Un battement d'ailes, un petit chirp, et hop au dodo !",
-            "Bobby is learning to snore in two languages.",
             "Bobby rêve de trèfles irlandais et de jardins français.",
-            "De Connemara à la Provence, Bobby te chante le sommeil.",
-            "A little piece of Ireland, un petit coin de France, et beaucoup de dodo.",
             "Slán abhaile... Bobby te souhaite un doux retour au pays des songes.",
             "Bobby has his head in the clouds, entre Dublin et Paris."
         ];
 
         const phraseElement = document.getElementById('bobbyPhrase');
-
+        const animContainer = document.getElementById('animContainer');
+        const bobbyBody = document.getElementById('bobbyBody');
+        const bobbyChest = document.getElementById('bobbyChest');
+        
         function updatePhrase() {
             phraseElement.classList.add('phrase-fade');
             setTimeout(() => {
-                const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-                phraseElement.textContent = randomPhrase;
+                phraseElement.textContent = phrases[Math.floor(Math.random() * phrases.length)];
                 phraseElement.classList.remove('phrase-fade');
             }, 400);
         }
-
-        // Première phrase au chargement
         updatePhrase();
 
-        let audioCtx, sourceNode, gainNode, timerInterval, rippleInterval;
+        let audioCtx, gainNode, sourceNode, visualInterval;
         let isPlaying = false;
-        let fadeStarted = false;
 
-        const btn = document.getElementById('playBtn');
-        const mainContainer = document.getElementById('mainContainer');
-        const animContainer = document.getElementById('animContainer');
-        const modeSelect = document.getElementById('modeSelect');
-        const timerSelect = document.getElementById('timerSelect');
-        const volSlider = document.getElementById('volume');
+        // --- GÉNÉRATEURS DE SON ---
+        function createNoiseBuffer(ctx, type) {
+            const bufSize = ctx.sampleRate * 2;
+            const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            let lastOut = 0;
 
-        function createRipple() {
-            if (!isPlaying || modeSelect.value !== 'river') return;
-            const ripple = document.createElement('div');
-            ripple.className = 'ripple';
-            const x = 50 + (Math.random() * 40 - 20);
-            const y = 45 + (Math.random() * 30 - 15);
-            ripple.style.left = `${x}%`; ripple.style.top = `${y}%`;
-            animContainer.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 4000);
-        }
-
-        function createRiverBuffer(ctx) {
-            const buf = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
-            const d = buf.getChannelData(0);
-            let lp0 = 0, lp1 = 0;
-            for (let i = 0; i < d.length; i++) {
-                const w = Math.random() * 2 - 1;
-                lp0 = 0.95 * lp0 + 0.05 * w;
-                lp1 = 0.95 * lp1 + 0.05 * lp0;
-                d[i] = lp1 * (Math.sin(i * 0.00004) * 0.2 + 0.8) * 3.5;
-            }
-            return buf;
-        }
-
-        function updateAnims() {
-            clearInterval(rippleInterval);
-            if (isPlaying && modeSelect.value === 'river') {
-                rippleInterval = setInterval(createRipple, 1500);
-                createRipple();
-            }
-        }
-
-        function startTimer(minutes) {
-            resetTimerLabels();
-            if (minutes === 0) return;
-            let timeLeft = minutes * 60;
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const opt = timerSelect.options[timerSelect.selectedIndex];
-                const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                opt.textContent = `⏳ ${m}:${s.toString().padStart(2, '0')}`;
-                if (timeLeft <= 30 && !fadeStarted && gainNode) {
-                    fadeStarted = true;
-                    const now = audioCtx.currentTime;
-                    gainNode.gain.cancelScheduledValues(now);
-                    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + timeLeft);
+            for (let i = 0; i < bufSize; i++) {
+                const white = Math.random() * 2 - 1;
+                if (type === 'pink') { // Utilisé pour pluie/vent
+                    lastOut = (lastOut + (0.02 * white)) / 1.02;
+                    data[i] = lastOut * 3.5;
+                } else if (type === 'brown') { // Utilisé pour espace/feu
+                    lastOut = (lastOut + (0.01 * white)) / 1.01;
+                    data[i] = lastOut * 8;
                 }
-                if (timeLeft <= 0) { clearInterval(timerInterval); if (isPlaying) togglePlay(); }
-            }, 1000);
+            }
+            return buffer;
         }
 
-        function resetTimerLabels() {
-            clearInterval(timerInterval);
-            Array.from(timerSelect.options).forEach(opt => opt.textContent = opt.getAttribute('data-label'));
+        function startAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            sourceNode = audioCtx.createBufferSource();
+            const mode = document.getElementById('modeSelect').value;
+            
+            // Configuration du son selon le mode
+            if (mode === 'river' || mode === 'rain') sourceNode.buffer = createNoiseBuffer(audioCtx, 'pink');
+            else sourceNode.buffer = createNoiseBuffer(audioCtx, 'brown');
+            
+            sourceNode.loop = true;
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = document.getElementById('volume').value;
+            
+            // Filtre pour adoucir le son
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = "lowpass";
+            filter.frequency.value = mode === 'space' ? 300 : 800;
+
+            sourceNode.connect(filter).connect(gainNode).connect(audioCtx.destination);
+            sourceNode.start();
+        }
+
+        // --- VISUELS DYNAMIQUES ---
+        function updateVisuals() {
+            animContainer.innerHTML = '';
+            clearInterval(visualInterval);
+            bobbyBody.classList.remove('glow-fire');
+            
+            if (!isPlaying) return;
+            const mode = document.getElementById('modeSelect').value;
+
+            if (mode === 'river') {
+                visualInterval = setInterval(() => {
+                    const r = document.createElement('div');
+                    r.className = 'ripple';
+                    r.style.left = (40 + Math.random() * 20) + '%';
+                    r.style.top = (40 + Math.random() * 20) + '%';
+                    animContainer.appendChild(r);
+                    setTimeout(() => r.remove(), 4000);
+                }, 1500);
+            } else if (mode === 'rain') {
+                visualInterval = setInterval(() => {
+                    const d = document.createElement('div');
+                    d.className = 'rain-drop';
+                    d.style.left = Math.random() * 100 + '%';
+                    d.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+                    animContainer.appendChild(d);
+                    setTimeout(() => d.remove(), 1000);
+                }, 50);
+            } else if (mode === 'fire') {
+                bobbyBody.classList.add('glow-fire');
+                visualInterval = setInterval(() => {
+                    const flicker = 0.8 + Math.random() * 0.4;
+                    bobbyChest.style.background = `rgba(230, 90, 40, ${flicker})`;
+                }, 100);
+            }
         }
 
         async function togglePlay() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (!isPlaying) {
-                // Changer la phrase au moment où on lance
                 updatePhrase();
-                
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                sourceNode = audioCtx.createBufferSource();
-                sourceNode.buffer = createRiverBuffer(audioCtx);
-                sourceNode.loop = true;
-                gainNode = audioCtx.createGain();
-                gainNode.gain.value = volSlider.value;
-                sourceNode.connect(gainNode).connect(audioCtx.destination);
-                sourceNode.start();
-                btn.classList.add('playing');
-                mainContainer.classList.add('playing-state');
+                startAudio();
+                document.getElementById('playBtn').classList.add('playing');
+                document.getElementById('mainContainer').classList.add('playing-state');
                 isPlaying = true;
-                startTimer(parseInt(timerSelect.value));
             } else {
-                if(sourceNode) { try { sourceNode.stop(); sourceNode.disconnect(); } catch(e) {} }
-                resetTimerLabels();
-                btn.classList.remove('playing');
-                mainContainer.classList.remove('playing-state');
+                if(sourceNode) sourceNode.stop();
+                document.getElementById('playBtn').classList.remove('playing');
+                document.getElementById('mainContainer').classList.remove('playing-state');
                 isPlaying = false;
-                fadeStarted = false;
             }
-            updateAnims();
+            updateVisuals();
         }
 
-        btn.addEventListener('click', togglePlay);
-        volSlider.addEventListener('input', (e) => {
+        document.getElementById('playBtn').addEventListener('click', togglePlay);
+        document.getElementById('modeSelect').addEventListener('change', () => { if(isPlaying) { togglePlay(); togglePlay(); } });
+        document.getElementById('volume').addEventListener('input', (e) => {
             document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
-            if (gainNode && !fadeStarted) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+            if(gainNode) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1);
         });
     </script>
 </body>
