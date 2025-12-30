@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sleepy Bobby - Version Intégrale</title>
+    <title>Sleepy Bobby - Timer Pro</title>
     <style>
         :root {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8;
@@ -12,9 +12,7 @@
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); font-family: system-ui, sans-serif; color: var(--text); }
         body { display: flex; align-items: center; justify-content: center; }
 
-        /* Calque d'animation au premier plan pour passer devant la carte */
         .anim-container { position: absolute; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
-        
         .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
         .card { background: var(--card); padding: 2rem; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
 
@@ -39,16 +37,12 @@
         /* --- EFFETS VISUELS --- */
         .zzz { position: absolute; color: #fb7185; font-weight: bold; opacity: 0; animation: zMove 3s ease-out forwards; font-size: 32px; left: 50%; top: 35%; }
         @keyframes zMove { 0% { transform: translate(20px, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(1.5); opacity: 0; } }
-
         .wave-line { position: absolute; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--primary), transparent); opacity: 0; animation: waveFlow 8s ease-in-out forwards; }
         @keyframes waveFlow { 0% { bottom: -5%; opacity: 0; } 50% { opacity: 0.4; } 100% { bottom: 105%; opacity: 0; } }
-
         .wind-gust { position: absolute; height: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); filter: blur(15px); border-radius: 50%; animation: drift 7s ease-in-out forwards; }
         @keyframes drift { from { left: -120%; } to { left: 120%; } }
-
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 4s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
         .rain-drop { position: absolute; background: rgba(255,255,255,0.3); width: 1px; height: 30px; animation: fall 0.8s linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
 
@@ -96,10 +90,10 @@
                 <div class="label-row"><span>Minuteur</span></div>
                 <select id="timerSelect">
                     <option value="0" data-base="Désactivé (∞)">Désactivé (∞)</option>
-                    <option value="1" data-base="1 Minute">1 Minute</option>
                     <option value="5" data-base="5 Minutes">5 Minutes</option>
                     <option value="15" data-base="15 Minutes">15 Minutes</option>
                     <option value="30" data-base="30 Minutes">30 Minutes</option>
+                    <option value="60" data-base="60 Minutes">60 Minutes</option>
                 </select>
             </div>
 
@@ -194,6 +188,30 @@
             Array.from(select.options).forEach(opt => opt.text = opt.getAttribute('data-base'));
         }
 
+        async function startBobby() {
+            isPlaying = true;
+            document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random()*phrases.length)];
+            document.getElementById('bobbyBox').classList.add('playing');
+            await initAudio(document.getElementById('modeSelect').value);
+            updateVisuals();
+
+            const select = document.getElementById('timerSelect');
+            let mins = parseInt(select.value);
+            if (mins > 0) {
+                timeLeft = mins * 60;
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                    select.options[select.selectedIndex].text = `${m}:${s < 10 ? '0' : ''}${s} restant`;
+                    if (timeLeft <= 30 && timeLeft > 0) {
+                        let fade = (timeLeft / 30) * document.getElementById('volume').value;
+                        gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5);
+                    }
+                    if (timeLeft <= 0) stopBobby();
+                }, 1000);
+            }
+        }
+
         function updateVisuals() {
             const anim = document.getElementById('animContainer');
             const mode = document.getElementById('modeSelect').value;
@@ -243,34 +261,17 @@
             }, 1200);
         }
 
-        document.getElementById('playBtn').addEventListener('click', async () => {
-            if (!isPlaying) {
-                isPlaying = true;
-                document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random()*phrases.length)];
-                document.getElementById('bobbyBox').classList.add('playing');
-                await initAudio(document.getElementById('modeSelect').value);
-                updateVisuals();
-
-                const select = document.getElementById('timerSelect');
-                let mins = parseInt(select.value);
-                if (mins > 0) {
-                    timeLeft = mins * 60;
-                    countdownInterval = setInterval(() => {
-                        timeLeft--;
-                        let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                        select.options[select.selectedIndex].text = `${m}:${s < 10 ? '0' : ''}${s} restant`;
-                        if (timeLeft <= 30 && timeLeft > 0) {
-                            let fade = (timeLeft / 30) * document.getElementById('volume').value;
-                            gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5);
-                        }
-                        if (timeLeft <= 0) stopBobby();
-                    }, 1000);
-                }
-            } else { stopBobby(); }
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (!isPlaying) startBobby(); else stopBobby();
         });
 
-        document.getElementById('modeSelect').addEventListener('change', async (e) => {
-            if (isPlaying) { await initAudio(e.target.value); updateVisuals(); }
+        document.getElementById('modeSelect').addEventListener('change', () => {
+            if (isPlaying) startBobby();
+        });
+
+        document.getElementById('timerSelect').addEventListener('change', () => {
+            stopBobby();
+            startBobby();
         });
 
         document.getElementById('volume').addEventListener('input', (e) => {
