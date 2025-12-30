@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sleepy Bobby - Clean UI</title>
+    <title>Sleepy Bobby</title>
     <style>
         :root {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8;
@@ -12,7 +12,11 @@
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; position: fixed; background: var(--bg); font-family: system-ui, sans-serif; color: var(--text); }
         body { display: flex; align-items: center; justify-content: center; }
 
-        .anim-container { position: absolute; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
+        /* Conteneurs d'animations */
+        .anim-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        #bgAnimContainer { z-index: 1; } /* DERRIÈRE LA CARTE */
+        #animContainer { z-index: 999; }   /* DEVANT LA CARTE */
+
         .container { width: 100%; max-width: 380px; padding: 20px; text-align: center; position: relative; z-index: 10; }
         .card { background: var(--card); padding: 2rem; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
 
@@ -53,8 +57,7 @@
     </style>
 </head>
 <body>
-    <div class="anim-container" id="animContainer"></div>
-    <div class="container">
+    <div class="anim-container" id="bgAnimContainer"></div> <div class="anim-container" id="animContainer"></div>   <div class="container">
         <div class="card">
             <h2 style="margin:0;">Sleepy Bobby</h2>
             <p id="bobbyPhrase" style="min-height:50px; font-size: 0.95rem; font-style: italic; margin: 10px 0; display: flex; align-items: center; justify-content: center;"></p>
@@ -129,7 +132,6 @@
             document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random() * phrases.length)];
         }
 
-        // --- NOUVELLE FONCTION : Remet les textes des options à zéro ---
         function resetTimerLabels() {
             const select = document.getElementById('timerSelect');
             Array.from(select.options).forEach(opt => {
@@ -194,14 +196,15 @@
             clearInterval(visualInterval); 
             clearInterval(countdownInterval);
             document.getElementById('animContainer').innerHTML = '';
+            document.getElementById('bgAnimContainer').innerHTML = ''; // Clear back container
             document.getElementById('birdMain').style.boxShadow = "none";
             document.getElementById('bChest').style.filter = "none";
-            resetTimerLabels(); // Remise à zéro au stop
+            resetTimerLabels();
         }
 
         async function startBobby() {
             clearInterval(countdownInterval);
-            resetTimerLabels(); // On nettoie les labels avant de commencer
+            resetTimerLabels();
             
             isPlaying = true;
             displayNewPhrase();
@@ -228,46 +231,51 @@
         }
 
         function updateVisuals() {
-            const anim = document.getElementById('animContainer');
+            const frontAnim = document.getElementById('animContainer');
+            const backAnim = document.getElementById('bgAnimContainer');
             const mode = document.getElementById('modeSelect').value;
             const bobby = document.getElementById('bobbyBox');
             const chest = document.getElementById('bChest');
             const mainBody = document.getElementById('birdMain');
             
-            anim.innerHTML = ''; clearInterval(visualInterval);
+            frontAnim.innerHTML = ''; 
+            backAnim.innerHTML = ''; 
+            clearInterval(visualInterval);
             bobby.classList.remove('sway-active');
             chest.style.filter = "none";
             mainBody.style.boxShadow = "none";
             
             if (!isPlaying) return;
 
+            // Logique de placement (Derrière vs Devant)
             if (mode === 'rain') {
                 for(let i=0; i<30; i++) {
                     let d = document.createElement('div'); d.className = 'rain-drop';
                     d.style.left = Math.random()*100+'%'; d.style.animationDelay = Math.random()*2+'s';
-                    anim.appendChild(d);
+                    frontAnim.appendChild(d);
                 }
             } else if (mode === 'space') {
                 for(let i=0; i<40; i++) {
                     let s = document.createElement('div'); s.className = 'star';
                     s.style.width = s.style.height = Math.random()*3+'px';
                     s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
-                    anim.appendChild(s);
+                    backAnim.appendChild(s); // DERRIÈRE
                 }
             }
 
             visualInterval = setInterval(() => {
                 if (mode === 'pink') {
                     let z = document.createElement('div'); z.className = 'zzz'; z.textContent = 'z';
-                    anim.appendChild(z); setTimeout(() => z.remove(), 3000);
+                    frontAnim.appendChild(z); setTimeout(() => z.remove(), 3000);
                 } else if (mode === 'waves') {
                     let w = document.createElement('div'); w.className = 'wave-line';
-                    anim.appendChild(w); setTimeout(() => w.remove(), 8000);
+                    backAnim.appendChild(w); // DERRIÈRE
+                    setTimeout(() => w.remove(), 8000);
                 } else if (mode === 'wind') {
                     bobby.classList.add('sway-active');
                     let g = document.createElement('div'); g.className = 'wind-gust';
                     g.style.top = Math.random()*100+'%'; g.style.width = (450+Math.random()*400)+'px';
-                    anim.appendChild(g); setTimeout(() => g.remove(), 7000);
+                    frontAnim.appendChild(g); setTimeout(() => g.remove(), 7000);
                 } else if (mode === 'fire') {
                     const intense = 0.6 + Math.random() * 0.6;
                     chest.style.filter = `brightness(${intense}) saturate(1.6)`;
