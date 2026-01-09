@@ -1031,43 +1031,42 @@ if (m === 'wind') {
         }, 800);
     }
 
- async function startBobby() {
-    stopBobby(); // Nettoie tout proprement avant de commencer
-    
+async function startBobby() {
+    stopAudio(); // On nettoie l'ancien son
     isPlaying = true;
-	updateMediaSession();
-if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
-    displayNewPhrase();
     
-    document.getElementById('bobbyBox').classList.add('playing');
-    await startAudio(document.getElementById('modeSelect').value);
-    updateVisuals();
+    // 1. D'abord, on initialise le contexte Audio
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-    const s = document.getElementById('timerSelect');
-    const selectedOption = s.options[s.selectedIndex]; // On cible l'option précise
-    let mins = parseInt(s.value);
-
-    if (mins > 0) {
-        timeLeft = mins * 60;
-        countdownInterval = setInterval(() => {
-            timeLeft--;
-            
-            if (timeLeft <= 0) {
-                stopBobby();
-            } else {
-                let m = Math.floor(timeLeft / 60);
-                let sec = timeLeft % 60;
-                // On met à jour le texte de l'option qui était sélectionnée au départ
-                selectedOption.text = `${m}:${sec < 10 ? '0' : ''}${sec} restant`;
-            }
-        }, 1000);
+    // 2. On lance le silence (Indispensable pour débloquer la zone de notification sur mobile)
+    const silentPlayer = document.getElementById('silentBuffer');
+    if (silentPlayer) {
+        silentPlayer.play().catch(e => console.log("Lancement du silence bloqué"));
     }
-	const silentPlayer = document.getElementById('silentBuffer');
-    silentPlayer.play(); // Lance le silence pour activer la notification
-    
-    updateMediaSession();
-    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
 
+    // 3. On génère le son choisi
+    const mode = document.getElementById('modeSelect').value;
+    if (mode === 'stream') createStream();
+    else if (mode === 'river') createRiver();
+    else if (mode === 'pink') createPinkNoise();
+    else if (mode === 'waves') createWaves();
+    else if (mode === 'rain') createRain();
+    else if (mode === 'wind') createWind();
+    else if (mode === 'fire') createFire();
+    else if (mode === 'space') createSpace();
+
+    // 4. MAINTENANT on active la Media Session (une fois que le son est officiellement lancé)
+    updateMediaSession();
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = "playing";
+    }
+
+    // Le reste de ton code (visuels, minuteur...)
+    displayNewPhrase();
+    document.getElementById('bobbyBox').classList.add('playing');
+    updateVisuals();
+    startTimer();
 }
 // Relance Bobby avec la nouvelle durée dès qu'on change le menu Minuteur
 document.getElementById('timerSelect').addEventListener('change', () => {
