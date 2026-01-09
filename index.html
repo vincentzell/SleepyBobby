@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="icon.png">
-    <title>Sleepy Bobby</title>
+    <title>Sleepy Bobby - Audio Setup</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bobby">
     <style>
         :root {
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8;
@@ -22,9 +26,9 @@
 
         /* --- BOBBY --- */
         .play-btn-wrapper { position: relative; margin: 10px auto 30px; width: 160px; height: 160px; display: flex; justify-content: center; }
-        .bobby-box { position: relative; width: 140px; height: 150px; transform-origin: center 85%; }
-        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: absolute; left: 25px; top: 10px; z-index: 30; overflow: hidden; transition: box-shadow 0.8s ease-in-out; }
-        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; transition: filter 0.8s ease-in-out; }
+        .bobby-box { position: relative; width: 140px; height: 150px; transform-origin: center 85%; transition: transform 0.5s ease; }
+        .bird-body { width: 90px; height: 100px; background: var(--bird-grey); border-radius: 50% 50% 45% 45%; position: absolute; left: 25px; top: 10px; z-index: 30; overflow: hidden; }
+        .chest { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: var(--bird-orange); border-radius: 50%; transition: filter 0.8s ease-in-out, box-shadow 0.8s ease-in-out;}
         .eye { width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%; transition: all 0.3s; }
         .tail { width: 25px; height: 40px; background: var(--bird-grey); border-radius: 0 0 10px 10px; position: absolute; bottom: 25px; left: 57.5px; z-index: 20; }
         .legs { display: flex; gap: 15px; position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%); z-index: 40; }
@@ -38,44 +42,88 @@
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
         @keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 
-        /* --- EFFETS VISUELS --- */
+        /* --- ANIMATIONS VISUELLES --- */
         .zzz { position: absolute; color: #fb7185; font-weight: bold; opacity: 0; animation: zMove 3s ease-out forwards; font-size: 32px; left: 50%; top: 35%; }
-        @keyframes zMove { 0% { transform: translate(20px, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(1.5); opacity: 0; } }
+        @keyframes zMove { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(1.5); opacity: 0; } }
         
-        .bubble { 
-            position: absolute; 
-            background: rgba(255, 255, 255, 0.25); 
-            border: 1.5px solid rgba(255, 255, 255, 0.4); 
-            border-radius: 50%; 
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-            animation: bubbleUp 6s ease-in forwards; 
-            pointer-events: none; 
-        }
-        @keyframes bubbleUp { 
-            0% { transform: translateY(0) scale(0.3); opacity: 0; } 
-            15% { opacity: 0.6; } 
-            100% { transform: translateY(-110vh) scale(1.3); opacity: 0; } 
-        }
+        .bubble { position: absolute; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%; animation: bubbleUp 6s ease-in forwards; }
+        @keyframes bubbleUp { 0% { transform: translateY(0) scale(0.3); opacity: 0; } 15% { opacity: 0.6; } 100% { transform: translateY(-110vh) scale(1.2); opacity: 0; } }
 
-        .wave-line { position: absolute; left: 0; width: 100%; height: 20px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.25), transparent); filter: blur(10px); opacity: 0; animation: waveFlow 10s ease-in-out infinite; }
-        .wave-2 { animation-delay: 1.2s; height: 15px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent); }
-        @keyframes waveFlow { 0% { bottom: -25%; opacity: 0; } 48% { bottom: 85%; opacity: 0.5; } 52% { bottom: 85%; opacity: 0.5; } 100% { bottom: -25%; opacity: 0; } }
+        .wave-line { position: absolute; left: 0; width: 100%; height: 40px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.15), transparent); filter: blur(15px); opacity: 0; animation: waveFlow 8s ease-in-out infinite; }
+        @keyframes waveFlow { 0% { bottom: -10%; opacity: 0; } 50% { bottom: 90%; opacity: 0.5; } 100% { bottom: -10%; opacity: 0; } }
 
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; top: 50%; left: 50%; transform-origin: center; animation: starTravel 5s linear infinite, twinkle 1s infinite alternate; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: starTravel 5s linear infinite; }
         @keyframes starTravel { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: var(--travel-dest) scale(1.5); opacity: 0; } }
-        @keyframes twinkle { from { filter: brightness(0.8); } to { filter: brightness(1.5) drop-shadow(0 0 2px white); } }
 
-        .wind-gust { position: absolute; height: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); filter: blur(15px); border-radius: 50%; animation: drift 7s ease-in-out forwards; }
-        @keyframes drift { from { left: -120%; } to { left: 120%; } }
-        .rain-drop { position: absolute; background: rgba(255,255,255,0.3); width: 1px; height: 30px; animation: fall 0.8s linear infinite; }
+        .rain-drop {
+    position: absolute;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
+    width: 1px;
+    height: 60px; /* Plus longue */
+    animation: fall 0.5s linear infinite; /* Plus rapide */
+}
         @keyframes fall { to { transform: translateY(110vh); } }
-        .ripple { position: absolute; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); animation: rippleEffect 4s cubic-bezier(0, 0.3, 0.7, 1) forwards; opacity: 0; }
-        @keyframes rippleEffect { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 500px; height: 500px; opacity: 0; } }
+.river-flow {
+    position: absolute;
+    bottom: -150px; /* Part du bas */
+    width: 2px;
+    height: 150px;
+    background: linear-gradient(0deg, transparent, rgba(56, 189, 248, 0.4), transparent);
+    border-radius: 2px;
+    filter: blur(2px);
+    animation: flowUp linear forwards;
+}
+.leaf {
+    position: absolute;
+    width: 10px;
+    height: 15px;
+    background: #4ade80;
+    border-radius: 10px 0 10px 0;
+    opacity: 0.8; /* Un peu plus opaque car devant */
+    pointer-events: none;
+    filter: blur(0.5px); /* Léger flou de mouvement */
+    animation: leafFall linear forwards;
+}
 
+@keyframes leafFall {
+    0% { transform: translate(-50px, -50px) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.6; }
+    100% { transform: translate(calc(100vw + 50px), calc(100vh + 50px)) rotate(720deg); opacity: 0; }
+}
+@keyframes flowUp {
+    to { transform: translateY(calc(-100vh - 150px)); }
+}
+
+/* Étincelles de cheminée */
+.spark {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fb923c;
+    border-radius: 50%;
+    filter: blur(1px);
+    box-shadow: 0 0 10px #ea580c;
+    animation: sparkUp 3s ease-out forwards;
+}
+
+@keyframes sparkUp {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(calc(Math.random() * 100px - 50px), -200px) scale(0); opacity: 0; }
+}
+
+/* Lueur d'ambiance */
+.fire-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 80%, rgba(234, 88, 12, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 2s;
+}
         /* --- UI --- */
-        .label-row { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; text-transform: none; opacity: 0.7; margin-bottom: 5px; }
+        .label-row { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; opacity: 0.7; margin-bottom: 5px; }
         .control-group { text-align: left; margin-top: 18px; }
-        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer; appearance: none; }
+        select { width: 100%; padding: 12px; border-radius: 12px; background: #2d3748; border: 1px solid rgba(255,255,255,0.1); color: white; appearance: none; cursor: pointer; }
+		
     </style>
 </head>
 <body>
@@ -85,6 +133,7 @@
         <div class="card">
             <h2 style="margin:0;">Sleepy Bobby</h2>
             <p id="bobbyPhrase" style="min-height:50px; font-size: 0.95rem; font-style: italic; margin: 10px 0; display: flex; align-items: center; justify-content: center;"></p>
+            
             <div class="play-btn-wrapper">
                 <div class="bobby-box" id="bobbyBox">
                     <div class="tail"></div>
@@ -99,139 +148,966 @@
                     <button id="playBtn" style="position:absolute; inset:0; background:none; border:none; cursor:pointer; z-index:100;"></button>
                 </div>
             </div>
-            <div class="control-group"><div class="label-row"><span>Ambiance</span></div>
+
+            <div class="control-group">
+                <div class="label-row"><span>Ambiance</span></div>
                 <select id="modeSelect">
-                    <option value="stream" selected>Ruisseau</option>
+                    <option value="stream">Ruisseau</option>
                     <option value="river">Rivière</option>
                     <option value="pink">Bruit Rose</option>
                     <option value="waves">Vagues</option>
                     <option value="rain">Pluie</option>
+					<option value="storm">Orage</option>
                     <option value="wind">Vent</option>
                     <option value="fire">Cheminée</option>
                     <option value="space">Espace</option>
                 </select>
             </div>
-            <div class="control-group"><div class="label-row"><span>Minuteur</span></div>
+
+            <div class="control-group">
+                <div class="label-row"><span>Minuteur</span></div>
                 <select id="timerSelect">
-                    <option value="0" data-base="Désactivé (∞)">Désactivé (∞)</option><option value="5" data-base="5 Minutes">5 Minutes</option><option value="15" data-base="15 Minutes">15 Minutes</option><option value="30" data-base="30 Minutes">30 Minutes</option><option value="60" data-base="60 Minutes">60 Minutes</option>
+                    <option value="0" data-base="Désactivé (∞)">Désactivé (∞)</option>
+                    <option value="5" data-base="5 Minutes">5 Minutes</option>
+                    <option value="15" data-base="15 Minutes">15 Minutes</option>
+                    <option value="30" data-base="30 Minutes">30 Minutes</option>
+                    <option value="60" data-base="60 Minutes">60 Minutes</option>
                 </select>
             </div>
-            <div class="control-group"><div class="label-row"><span>Volume <span id="volPerc">100%</span></span></div>
+
+            <div class="control-group">
+                <div class="label-row"><span>Volume <span id="volPerc">100%</span></span></div>
                 <input type="range" id="volume" min="0" max="1" step="0.01" value="1.0" style="width:100%">
             </div>
         </div>
     </div>
-
-    <script>
+	<audio id="silentBuffer" loop src="data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==/"></audio>
+   <script>
         const phrases = ["Bobby ébouriffe ses plumes pour te border.","Chut... Bobby troque son chant contre un doux murmure.","Un petit nid de sons pour une grande nuit de rêves.","Bobby ferme un œil... puis l'autre... avec toi.","Bobby says bonne nuit and wishes you sweet dreams.","Un battement d'ailes, un petit chirp, et hop au dodo !","Bobby is learning to snore in two languages.","Bobby has his head in the clouds, entre Dublin et Paris.","Bobby range son bec sous son aile, c'est l'heure.","Le dernier rouge-gorge couché éteint la lune !","Bobby rêve de trèfles irlandais et de jardins français.","De Connemara à la Provence, Bobby te chante le sommeil.","A little piece of Ireland, un petit coin de France, et beaucoup de dodo.","Slán abhaile... Bobby te souhaite un doux retour au pays des songes."];
-        let audioCtx, gainNode, sourceNode, visualInterval, countdownInterval, lfo, isPlaying = false, timeLeft = 0;
+		let visualInterval, countdownInterval, isPlaying = false, timeLeft = 0;
 
-        function displayNewPhrase() { document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random() * phrases.length)]; }
-        function resetTimerLabels() { const select = document.getElementById('timerSelect'); Array.from(select.options).forEach(opt => { opt.text = opt.getAttribute('data-base'); }); }
-        
-        function createStreamBuffer(ctx) {
-            const dur = 10;
-            const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
-            const d = buf.getChannelData(0);
-            let lp = 0, hp = 0;
-            for (let i = 0; i < d.length; i++) {
-                const w = Math.random() * 2 - 1;
-                lp = 0.985 * lp + 0.015 * w; 
-                hp = w - (0.95 * hp); 
-                d[i] = (lp + (hp * 0.015) + Math.sin(i * 0.01) * 0.002) * 6.4; // DOUBLÉ (était 3.2)
-            }
-            const fade = ctx.sampleRate * 2;
-            for(let i=0; i<fade; i++) {
-                const alpha = i/fade;
-                d[i] = d[i] * alpha + d[d.length - fade + i] * (1-alpha);
-            }
-            return buf;
+    function displayNewPhrase() { document.getElementById('bobbyPhrase').textContent = phrases[Math.floor(Math.random() * phrases.length)]; }
+    function resetTimerLabels() { const s = document.getElementById('timerSelect'); Array.from(s.options).forEach(o => o.text = o.getAttribute('data-base')); }
+
+    // --- NOUVEAU MOTEUR AUDIO (À REMPLIR) ---
+let audioCtx, masterGain, currentSource;
+
+async function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+}
+
+async function startAudio(mode) {
+    await initAudio();
+    stopAudio(); // Nettoyage de la source précédente
+
+    switch (mode) {
+        case 'wind':
+            createWind();
+            break;
+        case 'fire':
+            createFire();
+            break;
+        case 'stream':
+            createStream();
+            break;
+        case 'river':
+            createRiver();
+            break;
+        case 'pink':
+            createPinkNoise();
+            break;
+        case 'waves':
+            createWaves();
+            break;
+        case 'rain':
+            createRain(false);
+            break;
+		case 'storm': 
+            createRain(true);
+			break;
+        case 'space':
+            createSpace();
+            break;
+        default:
+            console.log("Ambiance non gérée : " + mode);
+    }
+}
+
+// --- AMBIANCES DÉJÀ CRÉÉES ---
+
+// (Garder ta fonction createWind ici)
+
+// (Garder ta fonction createFire et triggerCrackle ici)
+
+// --- PLACEHOLDERS POUR LES FUTURES AMBIANCES ---
+
+function createStream() {
+    // 1. Génération d'un bruit de base
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+    const streamSource = audioCtx.createBufferSource();
+    streamSource.buffer = noiseBuffer;
+    streamSource.loop = true;
+
+    // 2. Filtre principal pour le courant (Médiums-Aigus)
+    const mainFilter = audioCtx.createBiquadFilter();
+    mainFilter.type = 'bandpass';
+    mainFilter.frequency.value = 2000;
+    mainFilter.Q.value = 0.7;
+
+    const mainGain = audioCtx.createGain();
+    mainGain.gain.value = 0.1;
+
+    // 3. FONCTION ALÉATOIRE : Les "Splashs" et micro-variations
+    function randomFlow() {
+        if (!isPlaying || document.getElementById('modeSelect').value !== 'stream') return;
+        const now = audioCtx.currentTime;
+
+        // --- Variation 1 : Le débit général (mouvement lent) ---
+        const flowDuration = 2 + Math.random() * 3;
+        mainFilter.frequency.exponentialRampToValueAtTime(1500 + Math.random() * 1500, now + flowDuration);
+        mainGain.gain.linearRampToValueAtTime(0.08 + Math.random() * 0.1, now + flowDuration);
+
+        // --- Variation 2 : Les micro-gouttes (sons cristallins brefs) ---
+        if (Math.random() > 0.4) {
+            const drip = audioCtx.createOscillator();
+            const dripGain = audioCtx.createGain();
+            drip.type = 'sine';
+            drip.frequency.setValueAtTime(2500 + Math.random() * 2000, now);
+            drip.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+
+            dripGain.gain.setValueAtTime(0, now);
+            dripGain.gain.linearRampToValueAtTime(0.03, now + 0.02);
+            dripGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+            drip.connect(dripGain);
+            dripGain.connect(masterGain);
+            drip.start(now);
+            drip.stop(now + 0.15);
         }
 
-        function createRiverBuffer(ctx) { const buf = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate); const d = buf.getChannelData(0); let lp0 = 0, lp1 = 0; for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; lp0 = 0.95 * lp0 + 0.05 * w; lp1 = 0.95 * lp1 + 0.05 * lp0; d[i] = lp1 * (Math.sin(i * 0.00004) * 0.2 + 0.8) * 7.0; } return buf; } // DOUBLÉ
+        setTimeout(randomFlow, 500 + Math.random() * 1500);
+    }
 
-        async function initAudio(mode) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') await audioCtx.resume();
-            if(sourceNode) try { sourceNode.stop(); } catch(e) {}
-            if(lfo) try { lfo.stop(); } catch(e) {}
-            sourceNode = audioCtx.createBufferSource();
+    // Connexions
+    streamSource.connect(mainFilter);
+    mainFilter.connect(mainGain);
+    mainGain.connect(masterGain);
 
-            if (mode === 'stream') { sourceNode.buffer = createStreamBuffer(audioCtx); }
-            else if (mode === 'river') { sourceNode.buffer = createRiverBuffer(audioCtx); } 
-            else { 
-                const bufferSize = audioCtx.sampleRate * 4; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); let b0=0, b1=0, b2=0; for (let i = 0; i < bufferSize; i++) { let w = Math.random() * 2 - 1; if (mode === 'fire') { data[i] = (Math.random() > 0.998) ? (Math.random() * 0.8) : (w * 0.08); } // DOUBLÉ
-                else { b0 = 0.99886*b0 + w*0.0555; b1 = 0.99332*b1 + w*0.0750; b2 = 0.969*b2 + w*0.1538; data[i] = (b0 + b1 + b2 + w * 0.53) * 0.22; } } // DOUBLÉ
-                sourceNode.buffer = buffer; 
-            }
+    streamSource.start();
+    currentSource = streamSource;
+    randomFlow();
+}
+
+function createRiver() {
+    // 1. Génération d'un bruit brun (plus sourd et lourd que le blanc)
+    const bufferSize = 4 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02; // Filtre brownien
+        lastOut = output[i];
+        output[i] *= 6; // Gain compensateur
+    }
+
+    const riverSource = audioCtx.createBufferSource();
+    riverSource.buffer = noiseBuffer;
+    riverSource.loop = true;
+
+    // 2. Filtre de "Corps" (Le grondement sourd du débit)
+    const bodyFilter = audioCtx.createBiquadFilter();
+    bodyFilter.type = 'lowpass';
+    bodyFilter.frequency.value = 180;
+    const bodyGain = audioCtx.createGain();
+    bodyGain.gain.value = 0.4;
+
+    // 3. Filtre de "Surface" (Le clapotis constant)
+    const surfaceFilter = audioCtx.createBiquadFilter();
+    surfaceFilter.type = 'bandpass';
+    surfaceFilter.frequency.value = 800;
+    surfaceFilter.Q.value = 0.5;
+    const surfaceGain = audioCtx.createGain();
+    surfaceGain.gain.value = 0.15;
+
+    // 4. FONCTION D'ALÉATOIRE : Remous et variations de débit
+    function riverDynamics() {
+        if (!isPlaying || document.getElementById('modeSelect').value !== 'river') return;
+        const now = audioCtx.currentTime;
+
+        // Variation lente du débit (le "vent" sur l'eau)
+        const transition = 3 + Math.random() * 4;
+        bodyFilter.frequency.linearRampToValueAtTime(150 + Math.random() * 100, now + transition);
+        surfaceGain.gain.linearRampToValueAtTime(0.1 + Math.random() * 0.15, now + transition);
+
+        // --- Événement Aléatoire : Le Remous (Swirl) ---
+        // Se produit environ toutes les 2 à 5 secondes
+        if (Math.random() > 0.4) {
+            const swirlFilter = audioCtx.createBiquadFilter();
+            swirlFilter.type = 'bandpass';
+            swirlFilter.frequency.setValueAtTime(400, now);
+            swirlFilter.Q.value = 2; // Plus résonnant
+
+            const swirlGain = audioCtx.createGain();
+            swirlGain.gain.setValueAtTime(0, now);
             
-            sourceNode.loop = true; 
-            gainNode = audioCtx.createGain(); 
-            gainNode.gain.value = document.getElementById('volume').value;
-            const filter = audioCtx.createBiquadFilter(); 
-            filter.type = "lowpass";
+            // Animation du remous (montée en fréquence et volume)
+            const swirlDur = 1 + Math.random() * 2;
+            swirlFilter.frequency.exponentialRampToValueAtTime(1200 + Math.random() * 800, now + swirlDur);
+            swirlGain.gain.linearRampToValueAtTime(0.1, now + swirlDur / 2);
+            swirlGain.gain.linearRampToValueAtTime(0, now + swirlDur);
 
-            if (mode === 'stream') {
-                filter.frequency.value = 1300; 
-                const streamMod = audioCtx.createGain();
-                const modulator = audioCtx.createOscillator();
-                modulator.frequency.value = 0.1; 
-                const depth = audioCtx.createGain();
-                depth.gain.value = 0.08; 
-                modulator.connect(depth).connect(streamMod.gain);
-                streamMod.gain.value = 0.95;
-                sourceNode.connect(filter).connect(streamMod).connect(gainNode);
-                modulator.start();
-                lfo = modulator;
-            } else if (mode === 'waves') { 
-                filter.frequency.value = 800; const waveGain = audioCtx.createGain(); const constantGain = audioCtx.createGain(); constantGain.gain.value = 0.30; // DOUBLÉ
-                lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.1; lfo.connect(waveGain.gain); sourceNode.connect(filter); filter.connect(waveGain).connect(gainNode); filter.connect(constantGain).connect(gainNode); lfo.start(); 
-            } else { 
-                filter.frequency.value = (mode==='fire'? 3000 : mode==='wind'?300 : mode==='space'?150 : mode==='rain'?1500 : mode==='river'?1100 : 2500); sourceNode.connect(filter).connect(gainNode); 
+            riverSource.connect(swirlFilter);
+            swirlFilter.connect(swirlGain);
+            swirlGain.connect(masterGain);
+            
+            // Nettoyage des nœuds temporaires après l'effet
+            setTimeout(() => {
+                swirlFilter.disconnect();
+                swirlGain.disconnect();
+            }, swirlDur * 1000 + 100);
+        }
+
+        setTimeout(riverDynamics, 2000 + Math.random() * 3000);
+    }
+
+    // Connexions permanentes
+    riverSource.connect(bodyFilter);
+    bodyFilter.connect(bodyGain);
+    bodyGain.connect(masterGain);
+
+    riverSource.connect(surfaceFilter);
+    surfaceFilter.connect(surfaceGain);
+    surfaceGain.connect(masterGain);
+
+    riverSource.start();
+    currentSource = riverSource;
+    riverDynamics();
+}
+
+function createPinkNoise() {
+    const bufferSize = 4 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+
+    // Algorithme de Voss-McCartney pour un bruit rose parfait
+    let b0, b1, b2, b3, b4, b5, b6;
+    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        
+        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        output[i] *= 0.11; // Ajustement du volume
+        b6 = white * 0.115926;
+    }
+
+    const pinkSource = audioCtx.createBufferSource();
+    pinkSource.buffer = noiseBuffer;
+    pinkSource.loop = true;
+
+    // Un léger filtre passe-bas pour enlever les fréquences ultra-pénétrantes
+    const pinkFilter = audioCtx.createBiquadFilter();
+    pinkFilter.type = 'lowpass';
+    pinkFilter.frequency.value = 5000;
+
+    pinkSource.connect(pinkFilter);
+    pinkFilter.connect(masterGain);
+
+    pinkSource.start();
+    currentSource = pinkSource;
+}
+
+function createWaves() {
+    const bufferSize = 3 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02; // Base Brownienne
+        lastOut = output[i];
+        output[i] *= 4;
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    // --- FONCTION POUR CRÉER UNE COUCHE DE VAGUE AVEC RESSAC ---
+    function createWaveLayer(minFreq, maxFreq, minCycle, maxCycle, volWave, volGrit) {
+        // Corps de la vague (Lowpass)
+        const waveFilter = audioCtx.createBiquadFilter();
+        waveFilter.type = 'lowpass';
+        waveFilter.frequency.value = minFreq;
+        const waveGain = audioCtx.createGain();
+        waveGain.gain.value = 0;
+
+        // Ressac / Grain (Highpass pour le crissement)
+        const gritFilter = audioCtx.createBiquadFilter();
+        gritFilter.type = 'highpass';
+        gritFilter.frequency.value = 2500;
+        const gritGain = audioCtx.createGain();
+        gritGain.gain.value = 0;
+
+        noise.connect(waveFilter);
+        waveFilter.connect(waveGain);
+        waveGain.connect(masterGain);
+
+        noise.connect(gritFilter);
+        gritFilter.connect(gritGain);
+        gritGain.connect(masterGain);
+
+        function runner() {
+            if (!isPlaying || document.getElementById('modeSelect').value !== 'waves') return;
+            const now = audioCtx.currentTime;
+            const cycle = minCycle + Math.random() * (maxCycle - minCycle);
+            const attack = cycle * 0.35; // Montée un peu plus rapide
+            const decay = cycle - attack;
+
+            // MONTEE : L'eau arrive (Wave monte, Grit reste bas)
+            waveFilter.frequency.exponentialRampToValueAtTime(maxFreq, now + attack);
+            waveGain.gain.linearRampToValueAtTime(volWave, now + attack);
+            gritGain.gain.linearRampToValueAtTime(volGrit * 0.2, now + attack);
+
+            // DESCENTE : Le ressac (Wave descend, Grit monte fort puis s'éteint)
+            waveFilter.frequency.exponentialRampToValueAtTime(minFreq, now + cycle);
+            waveGain.gain.linearRampToValueAtTime(0.02, now + cycle);
+            
+            // Le pic du ressac arrive juste après le sommet de la vague
+            gritGain.gain.linearRampToValueAtTime(volGrit, now + attack + (decay * 0.2));
+            gritGain.gain.exponentialRampToValueAtTime(0.001, now + cycle);
+
+            setTimeout(runner, cycle * 1000);
+        }
+        runner();
+    }
+
+    // --- CONFIGURATION DES COUCHES ---
+    // 1. La Houle profonde (Peu de ressac)
+    createWaveLayer(40, 180, 11, 15, 0.4, 0.05);
+
+    // 2. La Vague moyenne (Ressac présent)
+    createWaveLayer(100, 500, 7, 10, 0.3, 0.25);
+
+    // 3. Le clapotis de bord (Ressac très marqué)
+    createWaveLayer(300, 900, 4, 6, 0.15, 0.4);
+
+    noise.start();
+    currentSource = noise;
+}
+
+function createRain(withThunder) {
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    
+    let b0, b1, b2, b3, b4, b5, b6;
+    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.1;
+        b6 = white * 0.115926;
+    }
+
+    const rainNoise = audioCtx.createBufferSource();
+    rainNoise.buffer = noiseBuffer;
+    rainNoise.loop = true;
+    const rainFilter = audioCtx.createBiquadFilter();
+    rainFilter.type = 'lowpass';
+    rainFilter.frequency.value = 1500;
+
+    rainNoise.connect(rainFilter);
+    rainFilter.connect(masterGain);
+    rainNoise.start();
+    
+    currentSource = rainNoise;
+    
+    // On lance les gouttelettes (pour les deux modes)
+    triggerDroplets(); 
+
+    // On lance le tonnerre UNIQUEMENT si on est en mode orage
+    if (withThunder) {
+        setTimeout(triggerThunder, 2000); 
+    }
+}
+
+function triggerDroplets() {
+    const currentMode = document.getElementById('modeSelect').value;
+if (!isPlaying || (currentMode !== 'rain' && currentMode !== 'storm')) return;
+
+    const now = audioCtx.currentTime;
+    const panner = audioCtx.createStereoPanner();
+    panner.pan.value = (Math.random() * 2 - 1) * 0.8; // Spatialisation
+
+    // --- TYPE 1 : L'IMPACT SEC (Bruit de clapotis) ---
+    const click = audioCtx.createBufferSource();
+    const clickBuf = audioCtx.createBuffer(1, 0.01 * audioCtx.sampleRate, audioCtx.sampleRate);
+    const clickData = clickBuf.getChannelData(0);
+    for (let i = 0; i < clickData.length; i++) clickData[i] = (Math.random() * 2 - 1) * Math.exp(-i/100);
+    click.buffer = clickBuf;
+
+    const clickFilter = audioCtx.createBiquadFilter();
+    clickFilter.type = 'bandpass';
+    clickFilter.frequency.value = 2000 + Math.random() * 3000;
+    
+    const clickGain = audioCtx.createGain();
+    clickGain.gain.setValueAtTime(Math.random() * 0.1, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+
+    // --- TYPE 2 : LE "PLOC" LIQUIDE (Sinusoïdale descendante) ---
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    osc.type = 'sine';
+    const baseFreq = 600 + Math.random() * 1200;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.3, now + 0.04);
+
+    oscGain.gain.setValueAtTime(Math.random() * 0.08, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+    // Connexions
+    click.connect(clickFilter);
+    clickFilter.connect(clickGain);
+    clickGain.connect(panner);
+
+    osc.connect(oscGain);
+    oscGain.connect(panner);
+
+    panner.connect(masterGain);
+
+    click.start(now);
+    osc.start(now);
+    osc.stop(now + 0.1);
+
+    // Rythme plus dense et irrégulier
+    setTimeout(triggerDroplets, 40 + Math.random() * 180);
+}
+
+function triggerThunder() {
+    const currentMode = document.getElementById('modeSelect').value;
+    if (!isPlaying || currentMode !== 'storm') return;
+
+    const now = audioCtx.currentTime;
+    
+    // --- 1. LE CRAQUEMENT (L'impact immédiat) ---
+    const crackleSource = audioCtx.createBufferSource();
+    const crackleBuffer = audioCtx.createBuffer(1, 0.5 * audioCtx.sampleRate, audioCtx.sampleRate);
+    const crackleData = crackleBuffer.getChannelData(0);
+    for (let i = 0; i < crackleData.length; i++) {
+        // Bruit blanc avec une chute exponentielle très rapide
+        crackleData[i] = (Math.random() * 2 - 1) * Math.exp(-i / 2000);
+    }
+    crackleSource.buffer = crackleBuffer;
+
+    const crackleFilter = audioCtx.createBiquadFilter();
+    crackleFilter.type = 'highpass';
+    crackleFilter.frequency.value = 800;
+
+    const crackleGain = audioCtx.createGain();
+    crackleGain.gain.setValueAtTime(0.4, now);
+    crackleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    // --- 2. LE GRONDEMENT (L'onde de choc) ---
+    const bufferSize = 6 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.05 * white)) / 1.05;
+        lastOut = output[i];
+        output[i] *= 15; 
+    }
+
+    const thunderSource = audioCtx.createBufferSource();
+    thunderSource.buffer = noiseBuffer;
+
+    const thunderFilter = audioCtx.createBiquadFilter();
+    thunderFilter.type = 'lowpass';
+    // On commence haut pour le choc initial
+    thunderFilter.frequency.setValueAtTime(1200, now);
+    thunderFilter.frequency.exponentialRampToValueAtTime(50, now + 3);
+
+    const thunderGain = audioCtx.createGain();
+    thunderGain.gain.setValueAtTime(0, now);
+    thunderGain.gain.linearRampToValueAtTime(1.0, now + 0.05); // Attaque ultra-violente
+    thunderGain.gain.exponentialRampToValueAtTime(0.001, now + 6);
+
+    // --- CONNEXIONS ---
+    crackleSource.connect(crackleFilter);
+    crackleFilter.connect(crackleGain);
+    crackleGain.connect(masterGain);
+
+    thunderSource.connect(thunderFilter);
+    thunderFilter.connect(thunderGain);
+    thunderGain.connect(masterGain);
+
+    // Lancement
+    crackleSource.start(now);
+    thunderSource.start(now);
+
+    // Effet visuel plus intense
+    triggerLightning();
+
+    // Fréquence de l'orage (un peu plus rapproché pour l'effet violent)
+    setTimeout(triggerThunder, 10000 + Math.random() * 20000);
+}
+
+function triggerLightning() {
+    const card = document.querySelector('.card');
+    const flash = (opacity, duration) => {
+        card.style.transition = `background ${duration}s`;
+        card.style.background = `rgba(255, 255, 255, ${opacity})`;
+        setTimeout(() => card.style.background = 'var(--card)', duration * 1000);
+    };
+
+    // Premier flash puissant
+    flash(0.3, 0.05);
+    
+    // Deuxième flash rapide (écho visuel)
+    setTimeout(() => flash(0.2, 0.03), 100);
+    
+    // Troisième flash plus faible
+    setTimeout(() => flash(0.1, 0.1), 300);
+}
+
+function createSpace() {
+    // 1. Le grondement du vaisseau (moteur sourd)
+    const engine = audioCtx.createOscillator();
+    const engineGain = audioCtx.createGain();
+    engine.type = 'sine';
+    engine.frequency.value = 50; 
+    engineGain.gain.value = 0.2;
+
+    // 2. La nappe stellaire (le souffle de l'espace)
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    const spaceFilter = audioCtx.createBiquadFilter();
+    spaceFilter.type = 'lowpass';
+    spaceFilter.Q.value = 5;
+    spaceFilter.frequency.value = 200;
+
+    // Automatisation de la résonance pour donner une impression de mouvement
+    function spaceOscillation() {
+        if (!isPlaying) return;
+        const now = audioCtx.currentTime;
+        spaceFilter.frequency.exponentialRampToValueAtTime(150 + Math.random() * 300, now + 4);
+        setTimeout(spaceOscillation, 4000);
+    }
+
+    noise.connect(spaceFilter);
+    spaceFilter.connect(masterGain);
+    engine.connect(engineGain);
+    engineGain.connect(masterGain);
+
+    noise.start();
+    engine.start();
+
+    // On stocke une référence pour arrêter les deux
+    currentSource = {
+        stop: () => {
+            noise.stop();
+            engine.stop();
+        },
+        disconnect: () => {
+            noise.disconnect();
+            engine.disconnect();
+            spaceFilter.disconnect();
+            engineGain.disconnect();
+        }
+    };
+    spaceOscillation();
+}
+
+function stopAudio() {
+    if (currentSource) {
+        try {
+            if(currentSource.stop) currentSource.stop();
+            currentSource.disconnect();
+        } catch(e) { 
+            // Évite les erreurs si déjà déconnecté
+        }
+        currentSource = null;
+    }
+}
+
+function updateVolume(val) {
+    if (masterGain) masterGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.1);
+}
+	// ambiances sonores
+	function createWind() {
+    // 1. Créer le tampon de bruit blanc
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+
+    // 2. Source en boucle
+    const whiteNoise = audioCtx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    // 3. Le Filtre (C'est lui qui crée le "Woooosh")
+    const windFilter = audioCtx.createBiquadFilter();
+    windFilter.type = 'lowpass';
+    windFilter.frequency.value = 400; // Fréquence de base (son sourd)
+    windFilter.Q.value = 10; // Résonance pour entendre le sifflement doux
+
+    // 4. L'automatisation des bourrasques
+    function gusts() {
+        if (!currentSource) return;
+        const now = audioCtx.currentTime;
+        const speed = 2 + Math.random() * 3; // Temps entre deux rafales
+        const freq = 300 + Math.random() * 800; // Intensité de la rafale
+        
+        // On fait monter et descendre la fréquence du filtre doucement
+        windFilter.frequency.exponentialRampToValueAtTime(freq, now + speed / 2);
+        windFilter.frequency.exponentialRampToValueAtTime(300, now + speed);
+        
+        setTimeout(gusts, speed * 1000);
+    }
+
+    whiteNoise.connect(windFilter);
+    windFilter.connect(masterGain);
+    whiteNoise.start();
+    
+    currentSource = whiteNoise; // Garder la référence pour l'arrêter
+    gusts();
+}
+function createFire() {
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    
+    let b0, b1, b2, b3, b4, b5, b6;
+    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.3;
+        b6 = white * 0.115926;
+    }
+
+    const fireNoise = audioCtx.createBufferSource();
+    fireNoise.buffer = noiseBuffer;
+    fireNoise.loop = true;
+
+    const fireFilter = audioCtx.createBiquadFilter();
+    fireFilter.type = 'lowpass';
+    fireFilter.frequency.value = 150;
+
+    fireNoise.connect(fireFilter);
+    fireFilter.connect(masterGain);
+    
+    currentSource = fireNoise; 
+    fireNoise.start();
+
+    // On force le premier crépitement sans attendre le setTimeout
+    triggerCrackle();
+}
+
+function triggerCrackle() {
+    const currentMode = document.getElementById('modeSelect').value;
+    if (!isPlaying || currentMode !== 'fire') return;
+
+    const now = audioCtx.currentTime;
+
+    // 1. Le "CLAC" (Bruit blanc filtré)
+    const noiseBurst = audioCtx.createBufferSource();
+    const bufferSize = 0.05 * audioCtx.sampleRate; // Très court (50ms)
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    
+    noiseBurst.buffer = buffer;
+
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'highpass';
+    noiseFilter.frequency.value = 1500 + Math.random() * 2000;
+
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(0, now);
+    noiseGain.gain.linearRampToValueAtTime(0.6, now + 0.001);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    // 2. Le "POP" (Oscillateur pour le corps du son)
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(100 + Math.random() * 100, now);
+    
+    oscGain.gain.setValueAtTime(0, now);
+    oscGain.gain.linearRampToValueAtTime(0.4, now + 0.001);
+    oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+    // Connexions
+    noiseBurst.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(masterGain);
+
+    osc.connect(oscGain);
+    oscGain.connect(masterGain);
+
+    // Lancement
+    noiseBurst.start(now);
+    osc.start(now);
+    osc.stop(now + 0.05);
+
+    // Rappel aléatoire (entre 100ms et 1.2s pour un rythme naturel)
+    setTimeout(triggerCrackle, 100 + Math.random() * 1100);
+}
+    // --- VISUAL ENGINE (CORRIGÉ) ---
+function stopBobby() {
+    isPlaying = false;
+	if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+    stopAudio();
+    document.getElementById('bobbyBox').classList.remove('playing', 'sway-active');
+    clearInterval(visualInterval);
+    clearInterval(countdownInterval); // On arrête le chrono
+    document.getElementById('animContainer').innerHTML = '';
+    document.getElementById('bgAnimContainer').innerHTML = '';
+    document.getElementById('birdMain').style.boxShadow = "none";
+    document.getElementById('bChest').style.filter = "none";
+    
+    resetTimerLabels(); // <--- C'est cette ligne qui remet les textes "5 Minutes" etc.
+	const silentPlayer = document.getElementById('silentBuffer');
+    silentPlayer.pause();
+    
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+}
+
+    function updateVisuals() {
+        const f = document.getElementById('animContainer'), b = document.getElementById('bgAnimContainer'), m = document.getElementById('modeSelect').value;
+        f.innerHTML = ''; b.innerHTML = ''; clearInterval(visualInterval);
+
+        // Animations Statiques (Pluie, Espace, Vagues)
+        if (m === 'rain' || m === 'storm') {
+        for (let i = 0; i < 40; i++) { 
+            let d = document.createElement('div'); 
+            d.className = 'rain-drop'; 
+            d.style.left = Math.random() * 100 + '%'; 
+            d.style.animationDelay = Math.random() * 2 + 's'; 
+            f.appendChild(d); 
+        }
+    }
+	else if (m === 'space') {
+            for (let i = 0; i < 50; i++) {
+                let s = document.createElement('div'); s.className = 'star'; const a = Math.random() * Math.PI * 2; const dist = 60 + Math.random() * 40;
+                s.style.setProperty('--travel-dest', `translate(${Math.cos(a) * dist}vw, ${Math.sin(a) * dist}vh)`);
+                s.style.left = "50%"; s.style.top = "50%"; s.style.width = s.style.height = (1 + Math.random() * 2) + 'px';
+                s.style.animationDelay = Math.random() * 5 + 's'; b.appendChild(s);
             }
-            gainNode.connect(audioCtx.destination); sourceNode.start();
-        }
+        } 
+		else if (m === 'waves') {
+for (let i = 0; i < 2; i++) {
+        let w = document.createElement('div');
+        w.className = 'wave-line';
+        w.style.animationDelay = (i * 2) + 's';
+        w.style.opacity = "0";
+        b.appendChild(w);
+    }
+}
 
-        function stopBobby() { isPlaying = false; if(sourceNode) try { sourceNode.stop(); } catch(e) {} if(lfo) try { lfo.stop(); } catch(e) {} document.getElementById('bobbyBox').classList.remove('playing','sway-active'); clearInterval(visualInterval); clearInterval(countdownInterval); document.getElementById('animContainer').innerHTML = ''; document.getElementById('bgAnimContainer').innerHTML = ''; document.getElementById('birdMain').style.boxShadow = "none"; document.getElementById('bChest').style.filter = "none"; resetTimerLabels(); }
+        // Animations Dynamiques (Intervalles)
+        visualInterval = setInterval(() => {
+            if (m === 'pink') {
+			
+    let z = document.createElement('div');
+    z.className = 'zzz';
+    z.textContent = 'z';
+    // Positionné juste au dessus de l'œil droit de Bobby
+    z.style.left = '52%'; 
+    z.style.top = '35%'; 
+    f.appendChild(z);
+    setTimeout(() => z.remove(), 3000);
+}
+            else if (m === 'stream') {
+                let bu = document.createElement('div'); bu.className = 'bubble';
+                bu.style.left = Math.random() * 100 + '%'; bu.style.bottom = '-20px';
+                let s = (5 + Math.random() * 10) + 'px';
+                bu.style.width = bu.style.height = s;
+                bu.style.animationDuration = (3 + Math.random() * 2) + 's';
+                b.appendChild(bu); setTimeout(() => bu.remove(), 5000);
+            } 
+			else if (m === 'river') {
+    // Rivière : Lignes de courant qui montent
+    let flow = document.createElement('div');
+    flow.className = 'river-flow';
+    flow.style.left = (Math.random() * 100) + '%'; // Répartition horizontale
+    flow.style.opacity = Math.random() * 0.3;
+    flow.style.animationDuration = (3 + Math.random() * 3) + 's'; // Un peu plus rapide
+    b.appendChild(flow);
+    setTimeout(() => flow.remove(), 6000);
+} 
+// ... dans ton intervalle visualInterval ...
+else if (m === 'fire') {
+    // 1. On crée une lueur de fond si elle n'existe pas
+    if (!b.querySelector('.fire-glow')) {
+        let glow = document.createElement('div');
+        glow.className = 'fire-glow';
+        b.appendChild(glow);
+        setTimeout(() => glow.style.opacity = 1, 10);
+    }
 
-        async function startBobby() {
-            clearInterval(countdownInterval); resetTimerLabels(); isPlaying = true; displayNewPhrase(); document.getElementById('bobbyBox').classList.add('playing');
-            await initAudio(document.getElementById('modeSelect').value); updateVisuals();
-            const select = document.getElementById('timerSelect'); let mins = parseInt(select.value);
-            if (mins > 0) { timeLeft = mins * 60; countdownInterval = setInterval(() => { timeLeft--; let m = Math.floor(timeLeft / 60), s = timeLeft % 60; select.options[select.selectedIndex].text = `${m}:${s < 10 ? '0' : ''}${s} restant`; if (timeLeft <= 30 && timeLeft > 0) { let fade = (timeLeft / 30) * document.getElementById('volume').value; if(gainNode) gainNode.gain.setTargetAtTime(fade, audioCtx.currentTime, 0.5); } if (timeLeft <= 0) stopBobby(); }, 1000); }
-        }
+    // 2. On crée une étincelle
+    let spark = document.createElement('div');
+    spark.className = 'spark';
+    spark.style.left = (40 + Math.random() * 20) + '%'; // Autour de Bobby
+    spark.style.bottom = '20%';
+    // Trajectoire aléatoire
+    const tx = (Math.random() * 100 - 50) + 'px';
+    spark.style.setProperty('--tx', tx);
+    spark.style.animation = `sparkUp ${1 + Math.random() * 2}s ease-out forwards`;
+    
+    f.appendChild(spark);
+    setTimeout(() => spark.remove(), 2000);
 
-        function updateVisuals() {
-            const front = document.getElementById('animContainer'), back = document.getElementById('bgAnimContainer'), mode = document.getElementById('modeSelect').value, bobby = document.getElementById('bobbyBox'), chest = document.getElementById('bChest'), body = document.getElementById('birdMain');
-            front.innerHTML = ''; back.innerHTML = ''; clearInterval(visualInterval); bobby.classList.remove('sway-active'); chest.style.filter = "none"; body.style.boxShadow = "none";
-            if (!isPlaying) return;
+    // 3. Effet de scintillement sur Bobby (ton code existant amélioré)
+    const i = 0.9 + Math.random() * 0.3;
+    const chest = document.getElementById('bChest');
+    chest.style.filter = `brightness(${i}) saturate(1.2)`;
+document.getElementById('birdMain').style.boxShadow = `0 0 ${15 + i * 10}px rgba(234, 88, 12, 0.2)`;
+}
+else if (m === 'wind') {
+    // Création d'une feuille de temps en temps
+    let leaf = document.createElement('div');
+    leaf.className = 'leaf';
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.top = '-20px';
+    // Variation de taille et de vitesse
+    let size = (5 + Math.random() * 8) + 'px';
+    leaf.style.width = size;
+    leaf.style.animationDuration = (4 + Math.random() * 4) + 's';
+    leaf.style.backgroundColor = ['#4ade80', '#22c55e', '#86efac'][Math.floor(Math.random()*3)];
+    
+    f.appendChild(leaf);
+    setTimeout(() => leaf.remove(), 8000);
+}
 
-            if (mode === 'rain') { for(let i=0; i<30; i++) { let d = document.createElement('div'); d.className = 'rain-drop'; d.style.left = Math.random()*100+'%'; d.style.animationDelay = Math.random()*2+'s'; front.appendChild(d); } } 
-            else if (mode === 'space') { for(let i=0; i<60; i++) { let s = document.createElement('div'); s.className = 'star'; const angle = Math.random() * Math.PI * 2; const dist = 60 + Math.random() * 40; s.style.setProperty('--travel-dest', `translate(calc(-50% + ${Math.cos(angle) * dist}vw), calc(-50% + ${Math.sin(angle) * dist}vh))`); s.style.width = s.style.height = (1 + Math.random() * 2) + 'px'; s.style.animationDelay = (Math.random() * 5) + 's'; back.appendChild(s); } } 
-            else if (mode === 'waves') { let w1 = document.createElement('div'); w1.className = 'wave-line'; back.appendChild(w1); let w2 = document.createElement('div'); w2.className = 'wave-line wave-2'; back.appendChild(w2); }
+// Gestion du balancement de Bobby (à placer juste après le bloc else if final)
+if (m === 'wind') {
+    document.getElementById('bobbyBox').classList.add('sway-active');
+} else {
+    document.getElementById('bobbyBox').classList.remove('sway-active');
+}
+        }, 800);
+    }
 
-            visualInterval = setInterval(() => {
-                if (mode === 'pink') { let z = document.createElement('div'); z.className = 'zzz'; z.textContent = 'z'; front.appendChild(z); setTimeout(() => z.remove(), 3000); } 
-                else if (mode === 'stream') { 
-                    let b = document.createElement('div'); b.className = 'bubble'; 
-                    b.style.left = (Math.random()*100)+'%'; b.style.bottom = "-30px"; 
-                    let size = (12 + Math.random()*15)+'px';
-                    b.style.width = size; b.style.height = size; 
-                    back.appendChild(b); setTimeout(() => b.remove(), 6000); 
-                } 
-                else if (mode === 'river') {
-                    let r = document.createElement('div'); r.className = 'ripple'; r.style.left = (30 + Math.random() * 40) + '%'; r.style.top = (40 + Math.random() * 20) + '%'; front.appendChild(r); setTimeout(() => r.remove(), 4000);
-                }
-                else if (mode === 'wind') { bobby.classList.add('sway-active'); let g = document.createElement('div'); g.className = 'wind-gust'; g.style.top = Math.random()*100+'%'; g.style.width = (450+Math.random()*400)+'px'; front.appendChild(g); setTimeout(() => g.remove(), 7000); } 
-                else if (mode === 'fire') { const intense = 0.6 + Math.random() * 0.6; chest.style.filter = `brightness(${intense}) saturate(1.6)`; body.style.boxShadow = `0 0 ${25 + intense * 35}px rgba(230, 90, 40, ${0.3 + intense * 0.3})`; }
-            }, 800); 
-        }
+ async function startBobby() {
+    stopBobby(); // Nettoie tout proprement avant de commencer
+    
+    isPlaying = true;
+	updateMediaSession();
+if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+    displayNewPhrase();
+    
+    document.getElementById('bobbyBox').classList.add('playing');
+    await startAudio(document.getElementById('modeSelect').value);
+    updateVisuals();
 
-        document.getElementById('playBtn').addEventListener('click', () => { if (!isPlaying) startBobby(); else stopBobby(); });
-        document.getElementById('modeSelect').addEventListener('change', () => { if (isPlaying) startBobby(); });
-        document.getElementById('timerSelect').addEventListener('change', () => { if (isPlaying) startBobby(); });
-        document.getElementById('volume').addEventListener('input', (e) => { document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%"; if(gainNode && isPlaying) gainNode.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.1); });
-        displayNewPhrase();
-    </script>
+    const s = document.getElementById('timerSelect');
+    const selectedOption = s.options[s.selectedIndex]; // On cible l'option précise
+    let mins = parseInt(s.value);
+
+    if (mins > 0) {
+        timeLeft = mins * 60;
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            
+            if (timeLeft <= 0) {
+                stopBobby();
+            } else {
+                let m = Math.floor(timeLeft / 60);
+                let sec = timeLeft % 60;
+                // On met à jour le texte de l'option qui était sélectionnée au départ
+                selectedOption.text = `${m}:${sec < 10 ? '0' : ''}${sec} restant`;
+            }
+        }, 1000);
+    }
+	const silentPlayer = document.getElementById('silentBuffer');
+    silentPlayer.play(); // Lance le silence pour activer la notification
+    
+    updateMediaSession();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+
+}
+// Relance Bobby avec la nouvelle durée dès qu'on change le menu Minuteur
+document.getElementById('timerSelect').addEventListener('change', () => {
+    if (isPlaying) {
+        startBobby(); 
+    }
+});
+    document.getElementById('playBtn').addEventListener('click', () => isPlaying ? stopBobby() : startBobby());
+    document.getElementById('modeSelect').addEventListener('change', () => isPlaying && startBobby());
+    document.getElementById('volume').addEventListener('input', (e) => {
+        document.getElementById('volPerc').textContent = Math.round(e.target.value * 100) + "%";
+        updateVolume(e.target.value);
+    });
+
+    displayNewPhrase();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => { });
+    }
+	
+function updateMediaSession() {
+    if ('mediaSession' in navigator) {
+        const mode = document.getElementById('modeSelect').value;
+        const modeNames = {
+            stream: "Ruisseau", river: "Rivière", pink: "Bruit Rose",
+            waves: "Vagues", rain: "Pluie", wind: "Vent", 
+            fire: "Cheminée", space: "Espace"
+        };
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: 'Sleepy Bobby',
+            artist: modeNames[mode] || 'Ambiance Relaxante',
+            album: 'Sommeil Paisible',
+            artwork: [{ src: 'icon.png', sizes: '512x512', type: 'image/png' }]
+        });
+
+        navigator.mediaSession.setActionHandler('play', startBobby);
+        navigator.mediaSession.setActionHandler('pause', stopBobby);
+    }
+}
+</script>
 </body>
 </html>
