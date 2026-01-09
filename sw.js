@@ -1,10 +1,12 @@
-const cacheName = 'bobby-v1';
-const assets = ['./', './index.html', './manifest.json'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(cacheName).then(cache => cache.addAll(assets)));
+// sw.js - Requis pour le critère d'installation Android
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+self.addEventListener('fetch', (event) => {
+    // Obligatoire : doit être présent même s'il est vide 
+    // pour que le navigateur considère l'app comme offline-capable
+    event.respondWith(fetch(event.request).catch(() => {
+        return caches.match(event.request);
+    }));
 });
