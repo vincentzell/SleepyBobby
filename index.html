@@ -1051,7 +1051,8 @@ async function startBobby() {
     else if (mode === 'river') createRiver();
     else if (mode === 'pink') createPinkNoise();
     else if (mode === 'waves') createWaves();
-    else if (mode === 'rain') createRain();
+	else if (mode === 'rain') createRain(false);
+    else if (mode === 'storm') createRain(true);
     else if (mode === 'wind') createWind();
     else if (mode === 'fire') createFire();
     else if (mode === 'space') createSpace();
