@@ -181,7 +181,7 @@
             </div>
         </div>
     </div>
-	<audio id="silentBuffer" loop src="data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==/"></audio>
+
    <script>
         const phrases = ["Bobby ébouriffe ses plumes pour te border.","Chut... Bobby troque son chant contre un doux murmure.","Un petit nid de sons pour une grande nuit de rêves.","Bobby ferme un œil... puis l'autre... avec toi.","Bobby says bonne nuit and wishes you sweet dreams.","Un battement d'ailes, un petit chirp, et hop au dodo !","Bobby is learning to snore in two languages.","Bobby has his head in the clouds, entre Dublin et Paris.","Bobby range son bec sous son aile, c'est l'heure.","Le dernier rouge-gorge couché éteint la lune !","Bobby rêve de trèfles irlandais et de jardins français.","De Connemara à la Provence, Bobby te chante le sommeil.","A little piece of Ireland, un petit coin de France, et beaucoup de dodo.","Slán abhaile... Bobby te souhaite un doux retour au pays des songes."];
 		let visualInterval, countdownInterval, isPlaying = false, timeLeft = 0;
@@ -897,7 +897,6 @@ function triggerCrackle() {
     // --- VISUAL ENGINE (CORRIGÉ) ---
 function stopBobby() {
     isPlaying = false;
-	if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
     stopAudio();
     document.getElementById('bobbyBox').classList.remove('playing', 'sway-active');
     clearInterval(visualInterval);
@@ -908,10 +907,6 @@ function stopBobby() {
     document.getElementById('bChest').style.filter = "none";
     
     resetTimerLabels(); // <--- C'est cette ligne qui remet les textes "5 Minutes" etc.
-	const silentPlayer = document.getElementById('silentBuffer');
-    silentPlayer.pause();
-    
-    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
 }
 
     function updateVisuals() {
@@ -1031,43 +1026,35 @@ if (m === 'wind') {
         }, 800);
     }
 
-async function startBobby() {
-    stopAudio(); // On nettoie l'ancien son
-    isPlaying = true;
+ async function startBobby() {
+    stopBobby(); // Nettoie tout proprement avant de commencer
     
-    // 1. D'abord, on initialise le contexte Audio
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') await audioCtx.resume();
-
-    // 2. On lance le silence (Indispensable pour débloquer la zone de notification sur mobile)
-    const silentPlayer = document.getElementById('silentBuffer');
-    if (silentPlayer) {
-        silentPlayer.play().catch(e => console.log("Lancement du silence bloqué"));
-    }
-
-    // 3. On génère le son choisi
-    const mode = document.getElementById('modeSelect').value;
-    if (mode === 'stream') createStream();
-    else if (mode === 'river') createRiver();
-    else if (mode === 'pink') createPinkNoise();
-    else if (mode === 'waves') createWaves();
-	else if (mode === 'rain') createRain(false);
-    else if (mode === 'storm') createRain(true);
-    else if (mode === 'wind') createWind();
-    else if (mode === 'fire') createFire();
-    else if (mode === 'space') createSpace();
-
-    // 4. MAINTENANT on active la Media Session (une fois que le son est officiellement lancé)
-    updateMediaSession();
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = "playing";
-    }
-
-    // Le reste de ton code (visuels, minuteur...)
+    isPlaying = true;
     displayNewPhrase();
+    
     document.getElementById('bobbyBox').classList.add('playing');
+    await startAudio(document.getElementById('modeSelect').value);
     updateVisuals();
-    startTimer();
+
+    const s = document.getElementById('timerSelect');
+    const selectedOption = s.options[s.selectedIndex]; // On cible l'option précise
+    let mins = parseInt(s.value);
+
+    if (mins > 0) {
+        timeLeft = mins * 60;
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            
+            if (timeLeft <= 0) {
+                stopBobby();
+            } else {
+                let m = Math.floor(timeLeft / 60);
+                let sec = timeLeft % 60;
+                // On met à jour le texte de l'option qui était sélectionnée au départ
+                selectedOption.text = `${m}:${sec < 10 ? '0' : ''}${sec} restant`;
+            }
+        }, 1000);
+    }
 }
 // Relance Bobby avec la nouvelle durée dès qu'on change le menu Minuteur
 document.getElementById('timerSelect').addEventListener('change', () => {
@@ -1087,27 +1074,6 @@ document.getElementById('timerSelect').addEventListener('change', () => {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => { });
     }
-	
-function updateMediaSession() {
-    if ('mediaSession' in navigator) {
-        const mode = document.getElementById('modeSelect').value;
-        const modeNames = {
-            stream: "Ruisseau", river: "Rivière", pink: "Bruit Rose",
-            waves: "Vagues", rain: "Pluie", wind: "Vent", 
-            fire: "Cheminée", space: "Espace"
-        };
-
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: 'Sleepy Bobby',
-            artist: modeNames[mode] || 'Ambiance Relaxante',
-            album: 'Sommeil Paisible',
-            artwork: [{ src: 'icon.png', sizes: '512x512', type: 'image/png' }]
-        });
-
-        navigator.mediaSession.setActionHandler('play', startBobby);
-        navigator.mediaSession.setActionHandler('pause', stopBobby);
-    }
-}
 </script>
 </body>
 </html>
